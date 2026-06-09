@@ -1,0 +1,17 @@
+[
+  {"name":"克洛泽","country":"德国","goals":16,"worldCups":4,"bestResult":"冠军"},
+  {"name":"罗纳尔多","country":"巴西","goals":15,"worldCups":3,"bestResult":"冠军"},
+  {"name":"盖德·穆勒","country":"西德","goals":14,"worldCups":2,"bestResult":"冠军"},
+  {"name":"方丹","country":"法国","goals":13,"worldCups":1,"bestResult":"季军"},
+  {"name":"贝利","country":"巴西","goals":12,"worldCups":4,"bestResult":"冠军"},
+  {"name":"柯奇士","country":"匈牙利","goals":11,"worldCups":1,"bestResult":"亚军"},
+  {"name":"克林斯曼","country":"德国","goals":11,"worldCups":3,"bestResult":"冠军"},
+  {"name":"拉托","country":"波兰","goals":10,"worldCups":3,"bestResult":"季军"},
+  {"name":"拉恩","country":"巴西","goals":10,"worldCups":4,"bestResult":"冠军"},
+  {"name":"莱因克尔","country":"英格兰","goals":10,"worldCups":2,"bestResult":"八强"},
+  {"name":"梅西","country":"阿根廷","goals":13,"worldCups":5,"bestResult":"冠军"},
+  {"name":"C罗","country":"葡萄牙","goals":8,"worldCups":5,"bestResult":"四强"},
+  {"name":"穆勒(托马斯)","country":"德国","goals":10,"worldCups":2,"bestResult":"冠军"},
+  {"name":"J·冯托里奥","country":"巴西","goals":8,"worldCups":2,"bestResult":"冠军"},
+  {"name":"巴蒂斯图塔","country":"阿根廷","goals":10,"worldCups":3,"bestResult":"八强"}
+]

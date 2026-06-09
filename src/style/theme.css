@@ -1,0 +1,173 @@
+/* ========== 全局重置 & 基础 ========== */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #0B0F1A;
+  color: #E8ECF1;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ========== 滚动条美化 ========== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2A3350; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3A4A6B; }
+
+/* ========== 动画关键帧 ========== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.03); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34,211,238,0.4); }
+  50%      { box-shadow: 0 0 20px 4px rgba(34,211,238,0.15); }
+}
+
+/* ========== 动画工具类 ========== */
+.anim-fadeInUp {
+  opacity: 0;
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+.anim-fadeIn {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+.anim-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+.anim-float {
+  animation: float 3s ease-in-out infinite;
+}
+.anim-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* 延迟类（最多到10） */
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
+.delay-6 { animation-delay: 0.6s; }
+.delay-7 { animation-delay: 0.7s; }
+.delay-8 { animation-delay: 0.8s; }
+
+/* ========== 卡片统一样式 ========== */
+.card {
+  background: #141B2D;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  border-color: rgba(255,255,255,0.12);
+}
+
+/* ========== 按钮样式 ========== */
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #06B6D4, #22D3EE);
+  color: #0B0F1A;
+  border: none; border-radius: 10px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 12px rgba(34,211,238,0.25);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(34,211,238,0.35);
+}
+
+.btn-gold {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #F59E0B, #FBBF24);
+  color: #0B0F1A;
+  border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all 0.25s ease;
+}
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(245,158,11,0.35);
+}
+
+/* ========== 标签/徽章 ========== */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.badge-new {
+  background: linear-gradient(135deg, #EF4444, #F87171);
+  color: #fff;
+}
+.badge-gold {
+  background: linear-gradient(135deg, #F59E0B, #FBBF24);
+  color: #0B0F1A;
+}
+
+/* ========== 渐变文字 ========== */
+.text-gradient {
+  background: linear-gradient(135deg, #22D3EE, #06B6D4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ========== 分割线 ========== */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  margin: 16px 0;
+}
+
+/* ========== 容器 ========== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ========== 标题系统 ========== */
+.section-title {
+  font-size: 22px; font-weight: 700;
+  color: #E8ECF1;
+  margin-bottom: 6px;
+}
+.section-subtitle {
+  font-size: 13px; color: #5A6478;
+  margin-bottom: 20px;
+}
