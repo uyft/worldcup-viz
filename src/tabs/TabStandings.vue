@@ -526,4 +526,331 @@ const goalsByGroupOpt = computed(() => {
   .overview-row { grid-template-columns: 1fr; }
   .col-bar { display: none; }
 }
+
+/* ===== 积分榜视觉强化版：增加彩色边框、流光和层次，不改变页面布局 ===== */
+
+/* 页面标题更有入口感 */
+.standings-header {
+  position: relative;
+  padding: 4px 0 6px;
+}
+
+.standings-header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 180px;
+  height: 2px;
+  background: linear-gradient(90deg, #22D3EE, #FBBF24, transparent);
+  border-radius: 999px;
+  opacity: 0.85;
+}
+
+.section-title {
+  position: relative;
+  padding-left: 14px;
+  letter-spacing: 1px;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 5px;
+  height: 22px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #22D3EE, #FBBF24);
+  transform: translateY(-50%);
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.55);
+}
+
+.badge-new {
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  box-shadow:
+    0 0 18px rgba(34, 211, 238, 0.22),
+    inset 0 1px 0 rgba(255,255,255,0.35);
+}
+
+/* 概览卡：彩色顶线 + 侧边辉光 + 背景纹理 */
+.ov-card {
+  border-color: rgba(255,255,255,0.10);
+  background:
+    linear-gradient(160deg, rgba(22, 32, 58, 0.96), rgba(10, 16, 34, 0.98)),
+    radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--ov-color) 22%, transparent), transparent 45%);
+  box-shadow:
+    0 10px 28px rgba(0,0,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.055);
+}
+
+.ov-card::before {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--ov-color), rgba(255,255,255,0.42), transparent);
+  opacity: 0.95;
+}
+
+.ov-card::after {
+  content: '';
+  position: absolute;
+  right: -34px;
+  top: -34px;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: var(--ov-color);
+  opacity: 0.12;
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.ov-card:hover {
+  border-color: var(--ov-color);
+  box-shadow:
+    0 12px 34px rgba(0,0,0,0.30),
+    0 0 26px color-mix(in srgb, var(--ov-color) 28%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.09);
+}
+
+.ov-icon {
+  border: 1px solid color-mix(in srgb, var(--ov-color) 35%, transparent);
+  background:
+    radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--ov-color) 26%, transparent), transparent 65%),
+    rgba(255,255,255,0.055);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--ov-color) 22%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.ov-val {
+  text-shadow: 0 0 14px rgba(255,255,255,0.08);
+}
+
+/* 组别切换：每个按钮有轻微色彩边框，激活时更亮 */
+.group-tabs {
+  padding: 6px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.055);
+}
+
+.group-btn {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+  border-color: rgba(34, 211, 238, 0.12);
+}
+
+.group-btn::after {
+  content: '';
+  position: absolute;
+  inset: auto 10px 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(34,211,238,0.65), transparent);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.group-btn:hover::after,
+.group-btn.active::after {
+  opacity: 1;
+}
+
+.group-btn:hover {
+  background: rgba(34,211,238,0.08);
+  box-shadow: 0 0 16px rgba(34,211,238,0.12);
+}
+
+.group-btn.active {
+  background:
+    linear-gradient(135deg, #22D3EE, #38BDF8 50%, #FBBF24);
+  box-shadow:
+    0 0 20px rgba(34,211,238,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.45);
+}
+
+/* 通用卡片：增加彩色边框、扫描线、角落光效 */
+.card {
+  border-color: rgba(34, 211, 238, 0.12);
+  background:
+    linear-gradient(160deg, rgba(20,27,45,0.96), rgba(12,18,35,0.99)),
+    radial-gradient(circle at 95% 0%, rgba(34,211,238,0.10), transparent 36%);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.26),
+    inset 0 1px 0 rgba(255,255,255,0.055);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(34,211,238,0.65), rgba(251,191,36,0.45), transparent);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  right: -46px;
+  top: -46px;
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34,211,238,0.16), transparent 68%);
+  pointer-events: none;
+}
+
+.card:hover {
+  border-color: rgba(34,211,238,0.28);
+  box-shadow:
+    0 14px 38px rgba(0,0,0,0.34),
+    0 0 26px rgba(34,211,238,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.075);
+}
+
+/* 面板头：增加彩色分隔线 */
+.panel-head {
+  position: relative;
+  background:
+    linear-gradient(90deg, rgba(34,211,238,0.055), transparent 52%),
+    rgba(255,255,255,0.012);
+  border-bottom-color: rgba(34,211,238,0.09);
+}
+
+.panel-head::after {
+  content: '';
+  position: absolute;
+  left: 22px;
+  bottom: -1px;
+  width: 94px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #22D3EE, #FBBF24);
+  box-shadow: 0 0 12px rgba(34,211,238,0.35);
+}
+
+.panel-title {
+  letter-spacing: 0.4px;
+}
+
+.panel-sub {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(34,211,238,0.07);
+  border: 1px solid rgba(34,211,238,0.10);
+  color: #8FA6C9;
+}
+
+/* 积分表：更清晰的晋级色彩 */
+.standings-table-wrap {
+  border-color: rgba(34,211,238,0.18);
+}
+
+.standings-table th {
+  color: #8FA6C9;
+  background:
+    linear-gradient(180deg, rgba(34,211,238,0.06), rgba(255,255,255,0.025));
+  border-bottom-color: rgba(34,211,238,0.10);
+}
+
+.standings-table td {
+  border-bottom-color: rgba(255,255,255,0.045);
+}
+
+.standings-table tr {
+  position: relative;
+}
+
+.standings-table tbody tr.promote td {
+  background:
+    linear-gradient(90deg, rgba(34,211,238,0.09), rgba(34,211,238,0.025) 36%, transparent);
+}
+
+.standings-table tbody tr:nth-child(1) td {
+  background:
+    linear-gradient(90deg, rgba(251,191,36,0.115), rgba(251,191,36,0.026) 36%, transparent);
+}
+
+.standings-table tbody tr:hover td {
+  background:
+    linear-gradient(90deg, rgba(34,211,238,0.11), rgba(255,255,255,0.035));
+}
+
+.rank-num {
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.rank-num.top {
+  background: linear-gradient(135deg, #22D3EE, #67E8F9);
+  box-shadow: 0 0 14px rgba(34,211,238,0.32);
+}
+
+.rank-num.third {
+  background: linear-gradient(135deg, #F59E0B, #FBBF24);
+  box-shadow: 0 0 14px rgba(251,191,36,0.30);
+}
+
+.pts-value {
+  color: #FBBF24;
+  text-shadow: 0 0 13px rgba(251,191,36,0.34);
+}
+
+.positive {
+  color: #34D399;
+  text-shadow: 0 0 10px rgba(52,211,153,0.22);
+}
+
+.negative {
+  color: #FB7185;
+  text-shadow: 0 0 10px rgba(244,63,94,0.22);
+}
+
+/* 积分条：增加金色终点光 */
+.pts-bar-wrap {
+  height: 7px;
+  background: rgba(255,255,255,0.075);
+  border: 1px solid rgba(255,255,255,0.035);
+}
+
+.pts-bar {
+  position: relative;
+  background: linear-gradient(90deg, #22D3EE, #38BDF8 52%, #FBBF24);
+  box-shadow: 0 0 12px rgba(34,211,238,0.28);
+}
+
+.pts-bar::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FBBF24;
+  box-shadow: 0 0 10px rgba(251,191,36,0.65);
+  transform: translateY(-50%);
+}
+
+/* 图表区域增加内框，让边界更明显 */
+.chart-wrap {
+  position: relative;
+}
+
+.chart-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 8px 10px 12px;
+  border: 1px solid rgba(34,211,238,0.055);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+/* 最后一张 ChartCard 如果内部也是 card，会继承上面效果 */
+
 </style>

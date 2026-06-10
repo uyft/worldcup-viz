@@ -1,194 +1,488 @@
 <template>
   <Transition name="splash-fade">
-    <div
-      v-if="visible"
-      class="splash-overlay"
-      :class="{
-        'is-leaving': animStage === 'out',
-        'is-goal': animStage === 'center'
-      }"
-      @click.self="dismiss"
-    >
-      <div class="splash-scene" aria-hidden="true">
-        <div class="vignette"></div>
-        <div class="stadium-light light-left"></div>
-        <div class="stadium-light light-right"></div>
-        <div class="big-year">2026</div>
+    <div v-if="visible" class="splash-overlay">
+      <canvas ref="canvasRef" class="three-canvas"></canvas>
 
-        <!-- 中央球门：足球会沿曲线射入这里 -->
-        <div class="main-goal" :class="{ 'goal-hit': animStage === 'center' }">
-          <div class="goal-back-glow"></div>
-          <div class="goal-frame front-frame"></div>
-          <div class="goal-frame back-frame"></div>
-          <div class="goal-side side-left"></div>
-          <div class="goal-side side-right"></div>
-          <div class="goal-grid"></div>
-          <div class="goal-net-depth"></div>
-          <div class="goal-impact"></div>
-        </div>
-
-        <!-- 曲线轨迹，只在足球飞入时显示 -->
-        <svg v-if="animStage === 'fly'" class="curve-trail" viewBox="0 0 1000 520" preserveAspectRatio="none">
-          <path class="curve-path curve-base" d="M 40 455 C 220 120, 560 80, 850 230" />
-          <path class="curve-path curve-light" d="M 40 455 C 220 120, 560 80, 850 230" />
-        </svg>
-
-        <div class="grass-field">
-          <span v-for="i in 8" :key="`stripe-${i}`" class="grass-stripe"></span>
-          <span
-            v-for="item in grassBlades"
-            :key="item.id"
-            class="grass-blade"
-            :style="item.style"
-          ></span>
-        </div>
-
-        <div class="float-particles">
-          <span
-            v-for="item in particles"
-            :key="item.id"
-            class="particle"
-            :style="item.style"
-          ></span>
-        </div>
+      <div class="hud" :class="{ 'hud-show': showUI }">
+        <div class="goal-text">⚽</div>
+        <div class="title">世界杯，盛夏</div>
+        <div class="sub-title">2026 美加墨 · 欢迎来到世界之巅</div>
+        <button class="enter-btn" @click="closeSplash">进入平台</button>
       </div>
 
-      <div class="intro-card" :class="{ 'card-show': animStage === 'center' }">
-        <div class="live-dot"></div>
-        <div>
-          <div class="eyebrow">GOAL · 2026 FIFA WORLD CUP</div>
-          <h1>美加墨世界杯</h1>
-          <p>一球入网，盛宴开启</p>
-        </div>
-      </div>
-
-      <!-- 足球：外层走曲线，内层做立体旋转 -->
-      <div
-        class="splash-ball-wrap"
-        :class="{
-          'ball-fly-in': animStage === 'fly',
-          'ball-center': animStage === 'center',
-          'ball-out': animStage === 'out'
-        }"
-      >
-        <div class="motion-shadow"></div>
-
-        <div class="football-3d">
-          <div class="football-core">
-            <!-- 纹理由内层单独滚动，外层固定高光和阴影，视觉上更像真实 3D 球体 -->
-            <div class="ball-texture">
-              <span class="panel panel-center"></span>
-              <span class="panel panel-top"></span>
-              <span class="panel panel-left"></span>
-              <span class="panel panel-right"></span>
-              <span class="panel panel-bottom-left"></span>
-              <span class="panel panel-bottom-right"></span>
-              <span class="panel panel-edge-a"></span>
-              <span class="panel panel-edge-b"></span>
-              <span class="panel panel-edge-c"></span>
-              <span class="panel panel-edge-d"></span>
-              <span class="seam seam-1"></span>
-              <span class="seam seam-2"></span>
-              <span class="seam seam-3"></span>
-              <span class="seam seam-4"></span>
-              <span class="seam seam-5"></span>
-              <span class="seam seam-6"></span>
-              <span class="curve-seam curve-seam-a"></span>
-              <span class="curve-seam curve-seam-b"></span>
-              <span class="curve-seam curve-seam-c"></span>
-            </div>
-            <span class="ball-depth-shadow"></span>
-            <span class="ball-gloss"></span>
-            <span class="ball-rim-light"></span>
-            <span class="ball-contact-light"></span>
-          </div>
-        </div>
-
-        <div v-if="animStage === 'fly'" class="trail-particles">
-          <span v-for="i in 20" :key="i" class="trail-dot" :style="{ '--i': i }"></span>
-        </div>
-
-        <div v-if="animStage === 'center'" class="ball-ring ring-a"></div>
-        <div v-if="animStage === 'center'" class="ball-ring ring-b"></div>
-      </div>
-
-      <button
-        v-if="animStage === 'center'"
-        class="splash-close"
-        type="button"
-        aria-label="关闭开场动画"
-        @click="dismiss"
-      >
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-
-      <p v-if="animStage === 'center'" class="splash-hint">点击任意位置进入平台</p>
+      <button v-if="showUI" class="close-btn" @click="closeSplash">×</button>
     </div>
   </Transition>
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import * as THREE from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 const emit = defineEmits(['done'])
 
 const visible = ref(true)
-const animStage = ref('fly')
-let centerTimer = null
-let closeTimer = null
+const showUI = ref(false)
+const canvasRef = ref(null)
 
-function random(min, max) {
-  return Math.random() * (max - min) + min
-}
+let renderer = null
+let scene = null
+let camera = null
+let football = null
+let goalNet = null
+let goalLight = null
+let animationId = null
+let startTime = 0
+let resizeHandler = null
 
-const grassBlades = computed(() =>
-  Array.from({ length: 46 }, (_, index) => ({
-    id: `blade-${index}`,
-    style: {
-      left: `${random(0, 100).toFixed(1)}%`,
-      bottom: `${random(0, 9).toFixed(1)}%`,
-      height: `${random(8, 22).toFixed(0)}px`,
-      animationDelay: `${random(0, 2).toFixed(2)}s`,
-      animationDuration: `${random(2.4, 4.8).toFixed(2)}s`
-    }
-  }))
-)
-
-const particles = computed(() =>
-  Array.from({ length: 32 }, (_, index) => ({
-    id: `particle-${index}`,
-    style: {
-      left: `${random(0, 100).toFixed(1)}%`,
-      top: `${random(0, 100).toFixed(1)}%`,
-      width: `${random(2, 5).toFixed(0)}px`,
-      height: `${random(2, 5).toFixed(0)}px`,
-      animationDelay: `${random(0, 4).toFixed(2)}s`,
-      animationDuration: `${random(4, 8).toFixed(2)}s`
-    }
-  }))
-)
+// 这里放你的 glb 足球模型路径
+// 推荐放在：public/models/football.glb
+const FOOTBALL_GLB_PATH = '/models/football.glb'
 
 onMounted(() => {
-  centerTimer = window.setTimeout(() => {
-    animStage.value = 'center'
-  }, 1850)
+  initThree()
+  loadFootballModel()
+  startTime = performance.now()
+  animate()
+
+  setTimeout(() => {
+    showUI.value = true
+  }, 3400)
 })
 
 onBeforeUnmount(() => {
-  window.clearTimeout(centerTimer)
-  window.clearTimeout(closeTimer)
+  destroyThree()
 })
 
-function dismiss() {
-  if (animStage.value !== 'center') return
-  animStage.value = 'out'
-  closeTimer = window.setTimeout(() => {
+function initThree() {
+  scene = new THREE.Scene()
+  scene.fog = new THREE.Fog(0x050b18, 8, 26)
+
+  camera = new THREE.PerspectiveCamera(
+    45,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100
+  )
+  camera.position.set(0, 1.8, 8.5)
+  camera.lookAt(0, 1.1, -3.2)
+
+  renderer = new THREE.WebGLRenderer({
+    canvas: canvasRef.value,
+    alpha: true,
+    antialias: true
+  })
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.outputColorSpace = THREE.SRGBColorSpace
+  renderer.toneMapping = THREE.ACESFilmicToneMapping
+  renderer.toneMappingExposure = 1.15
+  renderer.shadowMap.enabled = true
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
+  addLights()
+  addStadiumBackground()
+  addField()
+  addGoal()
+  addParticles()
+
+  resizeHandler = () => {
+    if (!camera || !renderer) return
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+  }
+  window.addEventListener('resize', resizeHandler)
+}
+
+function addLights() {
+  const ambient = new THREE.AmbientLight(0xffffff, 1.2)
+  scene.add(ambient)
+
+  const mainLight = new THREE.DirectionalLight(0xffffff, 3.2)
+  mainLight.position.set(-3, 6, 6)
+  mainLight.castShadow = true
+  mainLight.shadow.mapSize.width = 1024
+  mainLight.shadow.mapSize.height = 1024
+  scene.add(mainLight)
+
+  const cyanLight = new THREE.PointLight(0x22d3ee, 3.5, 18)
+  cyanLight.position.set(3.5, 2.5, 3)
+  scene.add(cyanLight)
+
+  const goldLight = new THREE.PointLight(0xfacc15, 2.8, 16)
+  goldLight.position.set(-4, 3.2, 1.5)
+  scene.add(goldLight)
+
+  goalLight = new THREE.PointLight(0x00e5ff, 0, 9)
+  goalLight.position.set(0, 1.6, -4.1)
+  scene.add(goalLight)
+}
+
+function addStadiumBackground() {
+  const bg = new THREE.Mesh(
+    new THREE.SphereGeometry(34, 48, 32),
+    new THREE.MeshBasicMaterial({
+      color: 0x061326,
+      side: THREE.BackSide
+    })
+  )
+  scene.add(bg)
+
+  // 顶部球场灯带
+  const lightGroup = new THREE.Group()
+  for (let i = 0; i < 48; i++) {
+    const angle = (-130 + i * (260 / 47)) * Math.PI / 180
+    const x = Math.sin(angle) * 12
+    const z = -5 + Math.cos(angle) * 5
+    const y = 5.1 + Math.sin(i * 0.6) * 0.25
+    const bulb = new THREE.Mesh(
+      new THREE.SphereGeometry(0.045, 12, 12),
+      new THREE.MeshBasicMaterial({ color: 0x9defff })
+    )
+    bulb.position.set(x, y, z)
+    lightGroup.add(bulb)
+  }
+  scene.add(lightGroup)
+
+  // 大型 2026 背景，用简单透明面片模拟光幕
+  const ringGeo = new THREE.RingGeometry(3.8, 4.2, 96)
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0x22d3ee,
+    transparent: true,
+    opacity: 0.12,
+    side: THREE.DoubleSide
+  })
+  const ring = new THREE.Mesh(ringGeo, ringMat)
+  ring.position.set(0, 2.4, -8)
+  ring.rotation.x = Math.PI / 2
+  scene.add(ring)
+}
+
+function addField() {
+  const field = new THREE.Mesh(
+    new THREE.PlaneGeometry(18, 22, 1, 1),
+    new THREE.MeshStandardMaterial({
+      color: 0x0f5f36,
+      roughness: 0.85,
+      metalness: 0.05
+    })
+  )
+  field.rotation.x = -Math.PI / 2
+  field.position.set(0, -1.05, -2)
+  field.receiveShadow = true
+  scene.add(field)
+
+  // 草地条纹
+  for (let i = 0; i < 8; i++) {
+    const stripe = new THREE.Mesh(
+      new THREE.PlaneGeometry(18, 1.25),
+      new THREE.MeshBasicMaterial({
+        color: i % 2 === 0 ? 0x1a7f45 : 0x116633,
+        transparent: true,
+        opacity: 0.18
+      })
+    )
+    stripe.rotation.x = -Math.PI / 2
+    stripe.position.set(0, -1.035, -11 + i * 2.5)
+    scene.add(stripe)
+  }
+
+  // 场地线
+  const lineMat = new THREE.LineBasicMaterial({
+    color: 0xbff7ff,
+    transparent: true,
+    opacity: 0.35
+  })
+  const points = [
+    new THREE.Vector3(-6, -1.0, -8),
+    new THREE.Vector3(6, -1.0, -8),
+    new THREE.Vector3(6, -1.0, 5),
+    new THREE.Vector3(-6, -1.0, 5),
+    new THREE.Vector3(-6, -1.0, -8)
+  ]
+  const fieldLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), lineMat)
+  scene.add(fieldLine)
+}
+
+function addGoal() {
+  const goalGroup = new THREE.Group()
+  goalGroup.position.set(0, -0.6, -4.8)
+
+  const postMat = new THREE.MeshStandardMaterial({
+    color: 0xf8fafc,
+    metalness: 0.15,
+    roughness: 0.25,
+    emissive: 0x3aa6ff,
+    emissiveIntensity: 0.12
+  })
+
+  const createPost = (x, y, z, sx, sy, sz) => {
+    const post = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), postMat)
+    post.position.set(x, y, z)
+    post.castShadow = true
+    goalGroup.add(post)
+  }
+
+  // 正面门框
+  createPost(-2.35, 1.25, 0, 0.08, 2.5, 0.08)
+  createPost(2.35, 1.25, 0, 0.08, 2.5, 0.08)
+  createPost(0, 2.5, 0, 4.8, 0.08, 0.08)
+
+  // 后方纵深门框
+  createPost(-2.35, 1.25, -0.95, 0.06, 2.35, 0.06)
+  createPost(2.35, 1.25, -0.95, 0.06, 2.35, 0.06)
+  createPost(0, 2.5, -0.95, 4.65, 0.06, 0.06)
+
+  // 连接杆
+  createPost(-2.35, 2.5, -0.48, 0.06, 0.06, 1.0)
+  createPost(2.35, 2.5, -0.48, 0.06, 0.06, 1.0)
+  createPost(-2.35, 0.02, -0.48, 0.05, 0.05, 1.0)
+  createPost(2.35, 0.02, -0.48, 0.05, 0.05, 1.0)
+
+  // 球网线条
+  const netMat = new THREE.LineBasicMaterial({
+    color: 0xbcefff,
+    transparent: true,
+    opacity: 0.38
+  })
+  const netGroup = new THREE.Group()
+
+  // 后网竖线
+  for (let i = 0; i <= 12; i++) {
+    const x = -2.25 + i * (4.5 / 12)
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(x, 0.05, -0.95),
+      new THREE.Vector3(x, 2.45, -0.95)
+    ])
+    netGroup.add(new THREE.Line(geo, netMat))
+  }
+
+  // 后网横线
+  for (let i = 0; i <= 8; i++) {
+    const y = 0.05 + i * (2.4 / 8)
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(-2.25, y, -0.95),
+      new THREE.Vector3(2.25, y, -0.95)
+    ])
+    netGroup.add(new THREE.Line(geo, netMat))
+  }
+
+  // 左右侧网
+  for (let i = 0; i <= 8; i++) {
+    const y = 0.05 + i * (2.4 / 8)
+    ;[-2.35, 2.35].forEach((x) => {
+      const geo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(x, y, 0),
+        new THREE.Vector3(x, y, -0.95)
+      ])
+      netGroup.add(new THREE.Line(geo, netMat))
+    })
+  }
+
+  goalNet = netGroup
+  goalGroup.add(netGroup)
+  scene.add(goalGroup)
+}
+
+function addParticles() {
+  const particleGeo = new THREE.BufferGeometry()
+  const count = 220
+  const positions = new Float32Array(count * 3)
+
+  for (let i = 0; i < count; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 18
+    positions[i * 3 + 1] = Math.random() * 6
+    positions[i * 3 + 2] = -8 + Math.random() * 12
+  }
+
+  particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+
+  const particleMat = new THREE.PointsMaterial({
+    color: 0x85f3ff,
+    size: 0.025,
+    transparent: true,
+    opacity: 0.55,
+    depthWrite: false
+  })
+
+  const particles = new THREE.Points(particleGeo, particleMat)
+  scene.add(particles)
+}
+
+function loadFootballModel() {
+  const loader = new GLTFLoader()
+
+  loader.load(
+    FOOTBALL_GLB_PATH,
+    (gltf) => {
+      football = gltf.scene
+      football.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true
+          child.receiveShadow = true
+          if (child.material) {
+            child.material.roughness = 0.38
+            child.material.metalness = 0.05
+          }
+        }
+      })
+      football.scale.set(0.72, 0.72, 0.72)
+      football.position.set(-7, -0.2, 4.5)
+      scene.add(football)
+    },
+    undefined,
+    () => {
+      // 没有 glb 文件时的备用 3D 球，避免页面空白
+      football = createFallbackFootball()
+      football.scale.set(0.82, 0.82, 0.82)
+      football.position.set(-7, -0.2, 4.5)
+      scene.add(football)
+      console.warn('football.glb 加载失败，已使用 Three.js 备用球体。请确认 public/models/football.glb 是否存在。')
+    }
+  )
+}
+
+function createFallbackFootball() {
+  const group = new THREE.Group()
+
+  const ball = new THREE.Mesh(
+    new THREE.SphereGeometry(0.72, 64, 64),
+    new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.32,
+      metalness: 0.04
+    })
+  )
+  ball.castShadow = true
+  group.add(ball)
+
+  const blackMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.42 })
+  const patchPositions = [
+    [0, 0, 0.735],
+    [0.42, 0.32, 0.48],
+    [-0.42, 0.32, 0.48],
+    [0.45, -0.35, 0.45],
+    [-0.45, -0.35, 0.45],
+    [0, 0.58, 0.34],
+    [0, -0.58, 0.34]
+  ]
+
+  patchPositions.forEach(([x, y, z]) => {
+    const patch = new THREE.Mesh(new THREE.CircleGeometry(0.16, 5), blackMat)
+    patch.position.set(x, y, z)
+    patch.lookAt(0, 0, 0)
+    patch.rotateY(Math.PI)
+    group.add(patch)
+  })
+
+  return group
+}
+
+function animate() {
+  animationId = requestAnimationFrame(animate)
+  const now = performance.now()
+  const elapsed = (now - startTime) / 1000
+
+  updateFootball(elapsed)
+  updateGoalEffect(elapsed)
+
+  renderer.render(scene, camera)
+}
+
+function updateFootball(elapsed) {
+  if (!football) return
+
+  const duration = 3.0
+  const t = Math.min(elapsed / duration, 1)
+  const ease = easeOutCubic(t)
+
+  // 三点贝塞尔曲线：左前方起脚 → 高弧线 → 射入球门
+  const p0 = new THREE.Vector3(-7.2, -0.45, 4.8)
+  const p1 = new THREE.Vector3(-2.6, 4.0, 1.0)
+  const p2 = new THREE.Vector3(0, 1.1, -4.95)
+  const pos = quadraticBezier(p0, p1, p2, ease)
+
+  football.position.copy(pos)
+
+  // 前半段逐渐放大，后半段进入球门略变小，形成景深
+  const scale = 0.42 + Math.sin(Math.min(t, 0.75) / 0.75 * Math.PI) * 0.55 + t * 0.22
+  const finalScale = t > 0.78 ? scale * (1 - (t - 0.78) * 0.9) : scale
+  football.scale.setScalar(Math.max(finalScale, 0.52))
+
+  // 真实 3D 旋转：三个轴一起转
+  football.rotation.x += 0.12
+  football.rotation.y += 0.18
+  football.rotation.z -= 0.1
+
+  // 临近球门时轻微镜头震动
+  if (t > 0.84 && t < 0.98) {
+    const shake = Math.sin(elapsed * 70) * 0.015
+    camera.position.x = shake
+    camera.position.y = 1.8 + Math.cos(elapsed * 55) * 0.01
+  } else {
+    camera.position.x += (0 - camera.position.x) * 0.08
+    camera.position.y += (1.8 - camera.position.y) * 0.08
+  }
+}
+
+function updateGoalEffect(elapsed) {
+  if (!goalNet || !goalLight) return
+
+  if (elapsed > 2.55 && elapsed < 3.35) {
+    const k = Math.sin((elapsed - 2.55) * Math.PI * 8) * 0.045
+    goalNet.position.z = k
+    goalLight.intensity = 6.5 * (1 - (elapsed - 2.55) / 0.8)
+  } else {
+    goalNet.position.z *= 0.86
+    goalLight.intensity *= 0.9
+  }
+}
+
+function quadraticBezier(p0, p1, p2, t) {
+  const oneMinusT = 1 - t
+  return new THREE.Vector3(
+    oneMinusT * oneMinusT * p0.x + 2 * oneMinusT * t * p1.x + t * t * p2.x,
+    oneMinusT * oneMinusT * p0.y + 2 * oneMinusT * t * p1.y + t * t * p2.y,
+    oneMinusT * oneMinusT * p0.z + 2 * oneMinusT * t * p1.z + t * t * p2.z
+  )
+}
+
+function easeOutCubic(x) {
+  return 1 - Math.pow(1 - x, 3)
+}
+
+function closeSplash() {
+  showUI.value = false
+  setTimeout(() => {
     visible.value = false
     emit('done')
-  }, 650)
+    destroyThree()
+  }, 320)
+}
+
+function destroyThree() {
+  if (animationId) cancelAnimationFrame(animationId)
+  if (resizeHandler) window.removeEventListener('resize', resizeHandler)
+
+  if (scene) {
+    scene.traverse((obj) => {
+      if (obj.geometry) obj.geometry.dispose()
+      if (obj.material) {
+        if (Array.isArray(obj.material)) {
+          obj.material.forEach((m) => m.dispose && m.dispose())
+        } else {
+          obj.material.dispose && obj.material.dispose()
+        }
+      }
+    })
+  }
+
+  if (renderer) {
+    renderer.dispose()
+    renderer.forceContextLoss && renderer.forceContextLoss()
+  }
 }
 </script>
 
@@ -196,738 +490,138 @@ function dismiss() {
 .splash-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  z-index: 99999;
   overflow: hidden;
-  cursor: pointer;
-  user-select: none;
   background:
-    radial-gradient(circle at 50% 48%, rgba(21, 94, 117, 0.34), transparent 22%),
-    radial-gradient(circle at 22% 18%, rgba(34, 211, 238, 0.14), transparent 26%),
-    radial-gradient(circle at 80% 22%, rgba(251, 191, 36, 0.10), transparent 28%),
-    linear-gradient(135deg, #050914 0%, #07142d 48%, #030712 100%);
-  perspective: 1400px;
+    radial-gradient(circle at 50% 45%, rgba(34, 211, 238, 0.13), transparent 32%),
+    linear-gradient(135deg, #020817 0%, #071426 48%, #020617 100%);
 }
 
-.splash-scene,
-.vignette,
-.float-particles {
+.three-canvas {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-}
-
-.vignette {
-  background: radial-gradient(circle at center, transparent 34%, rgba(0, 0, 0, 0.62) 100%);
-}
-
-.stadium-light {
-  position: absolute;
-  top: -16%;
-  width: 360px;
-  height: 120%;
-  opacity: 0.16;
-  filter: blur(1px);
-  transform-origin: top center;
-}
-
-.light-left {
-  left: 10%;
-  transform: rotate(-16deg);
-  background: linear-gradient(180deg, rgba(34, 211, 238, 0.75), transparent 76%);
-}
-
-.light-right {
-  right: 10%;
-  transform: rotate(16deg);
-  background: linear-gradient(180deg, rgba(251, 191, 36, 0.65), transparent 76%);
-}
-
-.big-year {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: Arial Black, Impact, sans-serif;
-  font-size: clamp(140px, 19vw, 320px);
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.035);
-  text-shadow: 0 0 50px rgba(34, 211, 238, 0.09);
-}
-
-/* ===== 中央 3D 球门 ===== */
-.main-goal {
-  position: absolute;
-  left: 50%;
-  top: 52%;
-  width: clamp(420px, 44vw, 680px);
-  height: clamp(220px, 24vw, 360px);
-  transform: translate(-50%, -50%) rotateX(7deg);
-  transform-style: preserve-3d;
-  opacity: 0.78;
-  filter: drop-shadow(0 0 28px rgba(34, 211, 238, 0.16));
-}
-
-.goal-back-glow {
-  position: absolute;
-  inset: 10% 6% -2%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(34, 211, 238, 0.18), transparent 68%);
-  transform: translateZ(-22px);
-}
-
-.goal-frame {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  border: 8px solid rgba(240, 249, 255, 0.88);
-  border-bottom: none;
-  border-radius: 18px 18px 0 0;
-  box-shadow:
-    0 0 18px rgba(255, 255, 255, 0.28),
-    0 0 34px rgba(34, 211, 238, 0.18),
-    inset 0 0 20px rgba(255, 255, 255, 0.10);
-}
-
-.back-frame {
-  opacity: 0.34;
-  transform: translate3d(24px, -20px, -90px) scale(0.92);
-}
-
-.goal-side {
-  position: absolute;
-  top: 8px;
-  width: 110px;
+  width: 100%;
   height: 100%;
-  border-top: 2px solid rgba(255, 255, 255, 0.22);
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.13) 1px, transparent 1px);
-  background-size: 20px 20px;
-  opacity: 0.46;
-  transform-origin: top center;
+  display: block;
 }
 
-.side-left {
-  left: -78px;
-  transform: skewY(-12deg) rotateY(62deg);
-}
-
-.side-right {
-  right: -78px;
-  transform: skewY(12deg) rotateY(-62deg);
-}
-
-.goal-grid {
-  position: absolute;
-  inset: 8px 8px 0;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.20) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px);
-  background-size: 38px 32px;
-  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.82) 62%, transparent 100%);
-  transform: translateZ(-38px);
-  transition: transform 0.34s ease, filter 0.34s ease;
-}
-
-.goal-net-depth {
-  position: absolute;
-  inset: 8px 8px 0;
-  background:
-    radial-gradient(circle at center, transparent 0 10px, rgba(255, 255, 255, 0.10) 11px 12px, transparent 13px),
-    linear-gradient(90deg, rgba(34, 211, 238, 0.10) 1px, transparent 1px);
-  background-size: 54px 48px, 42px 42px;
-  opacity: 0.32;
-  transform: translate3d(34px, -24px, -105px) scale(0.88);
-}
-
-.goal-impact {
+.hud {
   position: absolute;
   left: 50%;
-  top: 45%;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%) scale(0.1);
+  bottom: 9%;
+  transform: translateX(-50%) translateY(24px);
+  z-index: 5;
+  width: min(520px, 86vw);
+  padding: 24px 28px 26px;
+  text-align: center;
+  border-radius: 24px;
+  background: rgba(6, 18, 38, 0.62);
+  border: 1px solid rgba(34, 211, 238, 0.28);
+  box-shadow: 0 0 35px rgba(34, 211, 238, 0.18);
+  backdrop-filter: blur(12px);
   opacity: 0;
-  background: radial-gradient(circle, rgba(251, 191, 36, 0.72), rgba(34, 211, 238, 0.18) 42%, transparent 68%);
-}
-
-.main-goal.goal-hit .goal-grid {
-  animation: netShake 0.58s ease-out 0.02s;
-}
-
-.main-goal.goal-hit .goal-impact {
-  animation: goalFlash 0.72s ease-out;
-}
-
-@keyframes netShake {
-  0% { transform: translateZ(-38px); filter: blur(0); }
-  26% { transform: translate3d(0, 18px, -78px) scale(1.04); filter: blur(0.6px); }
-  52% { transform: translate3d(0, -7px, -52px) scale(0.98); }
-  100% { transform: translateZ(-38px); filter: blur(0); }
-}
-
-@keyframes goalFlash {
-  0% { opacity: 0.95; transform: translate(-50%, -50%) scale(0.2); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.8); }
-}
-
-/* ===== 曲线轨迹 ===== */
-.curve-trail {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: min(960px, 92vw);
-  height: min(520px, 62vh);
-  transform: translate(-50%, -50%);
-  z-index: 3;
-  overflow: visible;
-}
-
-.curve-path {
-  fill: none;
-  stroke-linecap: round;
-  stroke-dasharray: 1150;
-  stroke-dashoffset: 1150;
-  animation: drawCurve 1.55s ease-out forwards;
-}
-
-.curve-base {
-  stroke: rgba(255, 255, 255, 0.11);
-  stroke-width: 6;
-}
-
-.curve-light {
-  stroke: rgba(251, 191, 36, 0.78);
-  stroke-width: 3;
-  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.55));
-}
-
-@keyframes drawCurve {
-  0% { stroke-dashoffset: 1150; opacity: 0; }
-  16% { opacity: 1; }
-  100% { stroke-dashoffset: 0; opacity: 0; }
-}
-
-.grass-field {
-  position: absolute;
-  left: -5%;
-  right: -5%;
-  bottom: -8%;
-  height: 42%;
-  transform: rotateX(68deg);
-  transform-origin: bottom center;
-  background:
-    linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(22, 101, 52, 0.05), rgba(20, 83, 45, 0.5));
-  background-size: 80px 80px, 80px 80px, auto;
-  border-top: 1px solid rgba(34, 211, 238, 0.16);
-  box-shadow: 0 -30px 80px rgba(34, 211, 238, 0.08);
-}
-
-.grass-stripe {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 12.5%;
-  background: rgba(34, 197, 94, 0.035);
-}
-
-.grass-stripe:nth-child(odd) { background: rgba(34, 197, 94, 0.06); }
-.grass-stripe:nth-child(1) { left: 0; }
-.grass-stripe:nth-child(2) { left: 12.5%; }
-.grass-stripe:nth-child(3) { left: 25%; }
-.grass-stripe:nth-child(4) { left: 37.5%; }
-.grass-stripe:nth-child(5) { left: 50%; }
-.grass-stripe:nth-child(6) { left: 62.5%; }
-.grass-stripe:nth-child(7) { left: 75%; }
-.grass-stripe:nth-child(8) { left: 87.5%; }
-
-.grass-blade {
-  position: absolute;
-  width: 2px;
-  border-radius: 2px;
-  background: linear-gradient(180deg, rgba(74, 222, 128, 0.58), rgba(22, 163, 74, 0.10));
-  transform-origin: bottom center;
-  animation: bladeSway 3s ease-in-out infinite;
-}
-
-@keyframes bladeSway {
-  0%, 100% { transform: rotate(-4deg); }
-  50% { transform: rotate(5deg); }
-}
-
-.particle {
-  position: absolute;
-  border-radius: 50%;
-  background: #fbbf24;
-  box-shadow: 0 0 12px rgba(251, 191, 36, 0.55);
-  opacity: 0;
-  animation: floatUp linear infinite;
-}
-
-@keyframes floatUp {
-  0% { opacity: 0; transform: translate3d(0, 0, 0) scale(0.5); }
-  20% { opacity: 0.75; }
-  82% { opacity: 0.35; }
-  100% { opacity: 0; transform: translate3d(0, -120px, 0) scale(1.2); }
-}
-
-.intro-card {
-  position: absolute;
-  top: 10%;
-  left: 50%;
-  z-index: 6;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 22px;
-  border: 1px solid rgba(34, 211, 238, 0.20);
-  border-radius: 20px;
-  background: rgba(5, 11, 28, 0.55);
-  box-shadow: 0 0 40px rgba(34, 211, 238, 0.08), inset 0 0 28px rgba(255, 255, 255, 0.035);
-  backdrop-filter: blur(14px);
-  opacity: 0;
-  transform: translate(-50%, -16px) scale(0.96);
-  transition: opacity 0.45s ease, transform 0.45s ease;
   pointer-events: none;
+  transition: all 0.55s ease;
 }
 
-.intro-card.card-show {
+.hud-show {
   opacity: 1;
-  transform: translate(-50%, 0) scale(1);
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
 }
 
-.live-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #f43f5e;
-  box-shadow: 0 0 20px rgba(244, 63, 94, 0.75);
-}
-
-.eyebrow {
-  color: #22d3ee;
-  font-size: 12px;
+.goal-text {
+  font-size: 72px;
+  line-height: 1;
   font-weight: 900;
-  letter-spacing: 0.18em;
+  letter-spacing: 8px;
+  color: #facc15;
+  text-shadow:
+    0 0 18px rgba(250, 204, 21, 0.9),
+    0 0 50px rgba(250, 204, 21, 0.4),
+    0 0 80px rgba(34, 211, 238, 0.2);
+  animation: pulse-glow 2s ease-in-out infinite;
 }
 
-.intro-card h1 {
-  margin: 4px 0 2px;
+@keyframes pulse-glow {
+  0%, 100% { text-shadow: 0 0 18px rgba(250, 204, 21, 0.9), 0 0 50px rgba(250, 204, 21, 0.4), 0 0 80px rgba(34, 211, 238, 0.2); }
+  50% { text-shadow: 0 0 28px rgba(250, 204, 21, 1), 0 0 70px rgba(250, 204, 21, 0.6), 0 0 110px rgba(34, 211, 238, 0.35); }
+}
+
+.title {
+  margin-top: 14px;
+  font-size: 36px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 6px;
+  background: linear-gradient(135deg, #22d3ee 0%, #facc15 50%, #22d3ee 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-text 3s linear infinite;
+}
+
+@keyframes shimmer-text {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.sub-title {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(159, 183, 216, 0.9);
+  letter-spacing: 3px;
+}
+
+.enter-btn {
+  margin-top: 20px;
+  width: 172px;
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 800;
+  color: #03111f;
+  background: linear-gradient(135deg, #22d3ee, #60a5fa);
+  box-shadow: 0 0 26px rgba(34, 211, 238, 0.42);
+  transition: all 0.25s ease;
+}
+
+.enter-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 38px rgba(34, 211, 238, 0.68);
+}
+
+.close-btn {
+  position: absolute;
+  top: 28px;
+  right: 32px;
+  z-index: 6;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(8, 20, 40, 0.55);
   color: #fff;
   font-size: 30px;
-  line-height: 1;
-  letter-spacing: 0.04em;
-}
-
-.intro-card p {
-  margin: 0;
-  color: #8fa6c9;
-  font-size: 14px;
-}
-
-.splash-ball-wrap {
-  position: relative;
-  z-index: 5;
-  width: clamp(120px, 11vw, 170px);
-  height: clamp(120px, 11vw, 170px);
-  transform-style: preserve-3d;
-  will-change: transform, opacity, filter;
-}
-
-/* 重点：曲线飞入 + 射门入网 */
-.ball-fly-in {
-  animation: ballCurveGoal 1.85s cubic-bezier(0.16, 0.85, 0.24, 1.05) forwards;
-}
-
-@keyframes ballCurveGoal {
-  0% {
-    transform: translate3d(-48vw, 34vh, -940px) scale(0.16) rotateX(72deg) rotateY(-260deg) rotateZ(-1080deg);
-    opacity: 0;
-    filter: blur(9px);
-  }
-  10% {
-    opacity: 1;
-  }
-  30% {
-    transform: translate3d(-28vw, -10vh, -420px) scale(0.48) rotateX(48deg) rotateY(-90deg) rotateZ(-720deg);
-    filter: blur(4px);
-  }
-  55% {
-    transform: translate3d(1vw, -20vh, 130px) scale(1.15) rotateX(22deg) rotateY(110deg) rotateZ(-260deg);
-    filter: blur(0);
-  }
-  76% {
-    transform: translate3d(20vw, -4vh, 42px) scale(0.88) rotateX(18deg) rotateY(255deg) rotateZ(80deg);
-  }
-  90% {
-    transform: translate3d(0, -3vh, -75px) scale(0.72) rotateX(10deg) rotateY(380deg) rotateZ(250deg);
-  }
-  100% {
-    transform: translate3d(0, -3vh, -96px) scale(0.64) rotateX(0deg) rotateY(420deg) rotateZ(360deg);
-    opacity: 1;
-  }
-}
-
-.ball-center {
-  animation: ballInNet 3s ease-in-out infinite;
-}
-
-@keyframes ballInNet {
-  0%, 100% { transform: translate3d(0, -3vh, -96px) scale(0.64) rotateY(-6deg); }
-  50% { transform: translate3d(0, -3.8vh, -78px) scale(0.66) rotateY(7deg); }
-}
-
-.ball-out {
-  animation: ballFlyOut 0.65s cubic-bezier(0.6, 0, 1, 0.45) forwards;
-}
-
-@keyframes ballFlyOut {
-  0% { transform: translate3d(0, -3vh, -90px) scale(0.64); opacity: 1; filter: blur(0); }
-  100% { transform: translate3d(24vw, -18vh, -760px) scale(0.15) rotateZ(540deg); opacity: 0; filter: blur(8px); }
-}
-
-.motion-shadow {
-  position: absolute;
-  left: 50%;
-  bottom: -28px;
-  width: 150%;
-  height: 30px;
-  border-radius: 50%;
-  transform: translateX(-50%);
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.48), transparent 70%);
-  filter: blur(6px);
-  opacity: 0.42;
-}
-
-.football-3d,
-.football-core,
-.ball-texture {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  transform-style: preserve-3d;
-}
-
-/* 外层负责空间旋转：增加 rotate3d 和 translateZ，球体不再像平面贴图 */
-.football-3d {
-  transform: translateZ(42px) rotateX(-18deg) rotateY(22deg);
-  animation: footballSpin3D 0.62s linear infinite;
-  filter: drop-shadow(0 24px 26px rgba(0, 0, 0, 0.42));
-}
-
-.ball-center .football-3d {
-  animation: footballSettle3D 2.8s ease-in-out infinite;
-}
-
-@keyframes footballSpin3D {
-  0% {
-    transform: translateZ(42px) rotateX(-26deg) rotateY(0deg) rotateZ(0deg);
-  }
-  50% {
-    transform: translateZ(56px) rotateX(18deg) rotateY(210deg) rotateZ(250deg);
-  }
-  100% {
-    transform: translateZ(42px) rotateX(-26deg) rotateY(420deg) rotateZ(720deg);
-  }
-}
-
-@keyframes footballSettle3D {
-  0%, 100% {
-    transform: translateZ(40px) rotateX(-10deg) rotateY(-18deg) rotateZ(0deg);
-  }
-  50% {
-    transform: translateZ(54px) rotateX(8deg) rotateY(22deg) rotateZ(7deg);
-  }
-}
-
-.football-core {
-  overflow: hidden;
-  isolation: isolate;
-  background:
-    radial-gradient(circle at 26% 18%, rgba(255, 255, 255, 1) 0 7%, transparent 19%),
-    radial-gradient(circle at 34% 28%, #ffffff 0%, #f3f7fb 25%, #cbd5df 52%, #788491 72%, #1f2937 100%);
-  box-shadow:
-    0 0 30px rgba(255, 255, 255, 0.24),
-    0 0 76px rgba(34, 211, 238, 0.28),
-    0 0 118px rgba(251, 191, 36, 0.18),
-    inset 22px 20px 32px rgba(255, 255, 255, 0.58),
-    inset -30px -34px 48px rgba(0, 0, 0, 0.62),
-    inset -2px -2px 0 rgba(255, 255, 255, 0.12);
-}
-
-/* 纹理比球体稍大，旋转时会从边缘“卷过去”，更像球面滚动 */
-.ball-texture {
-  inset: -10%;
-  opacity: 0.98;
-  transform-origin: center;
-  animation: textureRoll 0.62s linear infinite;
-  background:
-    radial-gradient(circle at 50% 50%, transparent 0 62%, rgba(0, 0, 0, 0.22) 72%, rgba(0, 0, 0, 0.46) 100%);
-}
-
-.ball-center .ball-texture {
-  animation: textureSettle 2.8s ease-in-out infinite;
-}
-
-@keyframes textureRoll {
-  0% { transform: translate3d(-9%, 5%, 0) rotate(-34deg) scale(1.12); }
-  50% { transform: translate3d(9%, -6%, 0) rotate(178deg) scale(1.12); }
-  100% { transform: translate3d(-9%, 5%, 0) rotate(394deg) scale(1.12); }
-}
-
-@keyframes textureSettle {
-  0%, 100% { transform: translate3d(-2%, 1%, 0) rotate(-8deg) scale(1.09); }
-  50% { transform: translate3d(3%, -1%, 0) rotate(10deg) scale(1.09); }
-}
-
-.panel {
-  position: absolute;
-  width: 25%;
-  height: 25%;
-  background:
-    linear-gradient(145deg, #020617, #0f172a 62%, #1e293b);
-  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
-  box-shadow:
-    inset 4px 4px 8px rgba(255, 255, 255, 0.13),
-    inset -5px -6px 10px rgba(0, 0, 0, 0.58),
-    0 1px 4px rgba(0, 0, 0, 0.38);
-  z-index: 2;
-}
-
-.panel-center { top: 37%; left: 37%; transform: scale(1.12); }
-.panel-top { top: 6%; left: 38%; transform: rotate(8deg) scale(0.82) skewX(-7deg); }
-.panel-left { top: 33%; left: 7%; transform: rotate(18deg) scaleX(0.7) scaleY(0.92); }
-.panel-right { top: 33%; right: 7%; transform: rotate(-18deg) scaleX(0.7) scaleY(0.92); }
-.panel-bottom-left { bottom: 7%; left: 23%; transform: rotate(34deg) scaleX(0.78) scaleY(0.84); }
-.panel-bottom-right { bottom: 7%; right: 23%; transform: rotate(-34deg) scaleX(0.78) scaleY(0.84); }
-.panel-edge-a { top: 10%; left: -4%; transform: rotate(-18deg) scaleX(0.46) scaleY(0.72); opacity: 0.78; }
-.panel-edge-b { bottom: 17%; right: -4%; transform: rotate(16deg) scaleX(0.46) scaleY(0.72); opacity: 0.78; }
-.panel-edge-c { top: 54%; left: -7%; transform: rotate(32deg) scaleX(0.4) scaleY(0.6); opacity: 0.62; }
-.panel-edge-d { top: 12%; right: -6%; transform: rotate(-32deg) scaleX(0.42) scaleY(0.62); opacity: 0.62; }
-
-.seam,
-.curve-seam {
-  position: absolute;
-  background: rgba(8, 16, 32, 0.28);
-  border-radius: 999px;
-  transform-origin: left center;
-  z-index: 1;
-}
-
-.seam {
-  height: 3px;
-  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.14);
-}
-
-.seam-1 { top: 30%; left: 27%; width: 47%; transform: rotate(4deg); }
-.seam-2 { top: 42%; left: 19%; width: 34%; transform: rotate(52deg); }
-.seam-3 { top: 42%; right: 19%; width: 34%; transform: rotate(-52deg); transform-origin: right center; }
-.seam-4 { bottom: 26%; left: 28%; width: 46%; transform: rotate(-3deg); }
-.seam-5 { top: 58%; left: 12%; width: 76%; transform: rotate(22deg); opacity: 0.20; }
-.seam-6 { top: 22%; left: 13%; width: 72%; transform: rotate(-26deg); opacity: 0.14; }
-
-/* 曲面缝线：椭圆弧会强化“这是一个球”的感觉 */
-.curve-seam {
-  width: 76%;
-  height: 54%;
-  border: 3px solid rgba(8, 16, 32, 0.20);
-  background: transparent;
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.08);
-}
-.curve-seam-a { left: 12%; top: 18%; transform: rotate(20deg) scaleX(0.72); opacity: 0.42; }
-.curve-seam-b { left: 10%; top: 28%; transform: rotate(-30deg) scaleX(0.48); opacity: 0.32; }
-.curve-seam-c { left: 22%; top: 4%; transform: rotate(86deg) scaleX(0.55); opacity: 0.26; }
-
-.ball-depth-shadow,
-.ball-gloss,
-.ball-rim-light,
-.ball-contact-light {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.ball-depth-shadow {
-  z-index: 4;
-  background:
-    radial-gradient(circle at 76% 78%, rgba(0, 0, 0, 0.60), transparent 42%),
-    radial-gradient(circle at 58% 54%, transparent 0 42%, rgba(0, 0, 0, 0.34) 74%, rgba(0, 0, 0, 0.72) 100%);
-  mix-blend-mode: multiply;
-}
-
-.ball-gloss {
-  z-index: 5;
-  background:
-    radial-gradient(ellipse at 29% 20%, rgba(255, 255, 255, 0.82) 0 8%, rgba(255, 255, 255, 0.36) 9% 19%, transparent 36%),
-    linear-gradient(120deg, rgba(255, 255, 255, 0.24), transparent 34%, rgba(34, 211, 238, 0.13) 68%, transparent 100%);
-  mix-blend-mode: screen;
-}
-
-.ball-rim-light {
-  z-index: 6;
-  box-shadow:
-    inset -12px 0 20px rgba(34, 211, 238, 0.34),
-    inset 8px 0 14px rgba(251, 191, 36, 0.14),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.15);
-}
-
-.ball-contact-light {
-  z-index: 7;
-  inset: 6%;
-  background: radial-gradient(circle at 52% 50%, transparent 0 57%, rgba(255,255,255,0.14) 59%, transparent 66%);
-  filter: blur(0.4px);
-}
-
-.trail-particles {
-  position: absolute;
-  inset: -80px;
-  pointer-events: none;
-}
-
-.trail-dot {
-  --delay: calc(var(--i) * 0.026s);
-  position: absolute;
-  top: calc(76% - var(--i) * 2.8%);
-  right: calc(68% + var(--i) * 3.6%);
-  width: calc(9px - var(--i) * 0.22px);
-  height: calc(9px - var(--i) * 0.22px);
-  min-width: 3px;
-  min-height: 3px;
-  border-radius: 50%;
-  background: #fbbf24;
-  box-shadow: 0 0 16px rgba(251, 191, 36, 0.72);
-  opacity: 0;
-  animation: trailSpark 0.78s ease-out forwards;
-  animation-delay: var(--delay);
-}
-
-@keyframes trailSpark {
-  0% { opacity: 0.95; transform: translate3d(0, 0, 0) scale(1); }
-  100% { opacity: 0; transform: translate3d(-90px, 30px, 0) scale(0.15); }
-}
-
-.ball-ring {
-  position: absolute;
-  inset: -26px;
-  border-radius: 50%;
-  pointer-events: none;
-  border: 1px solid rgba(34, 211, 238, 0.22);
-  box-shadow: 0 0 26px rgba(34, 211, 238, 0.16);
-  animation: ringPulse 2.2s ease-in-out infinite;
-}
-
-.ring-b {
-  inset: -44px;
-  border-color: rgba(251, 191, 36, 0.18);
-  animation-delay: 0.35s;
-}
-
-@keyframes ringPulse {
-  0%, 100% { transform: scale(0.92); opacity: 0.25; }
-  50% { transform: scale(1.08); opacity: 0.68; }
-}
-
-.splash-close {
-  position: absolute;
-  top: 38px;
-  right: 42px;
-  z-index: 10;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: #cbd5e1;
-  background: rgba(8, 17, 36, 0.6);
-  backdrop-filter: blur(12px);
+  line-height: 38px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.22s ease, color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  backdrop-filter: blur(10px);
+  transition: all 0.25s ease;
 }
 
-.splash-close:hover {
-  color: #fb7185;
-  border-color: rgba(251, 113, 133, 0.65);
-  box-shadow: 0 0 28px rgba(244, 63, 94, 0.25);
-  transform: scale(1.08) rotate(90deg);
+.close-btn:hover {
+  background: rgba(34, 211, 238, 0.22);
+  transform: rotate(90deg) scale(1.06);
 }
 
-.splash-hint {
-  position: absolute;
-  bottom: 52px;
-  z-index: 6;
-  margin: 0;
-  color: rgba(203, 213, 225, 0.64);
-  font-size: 14px;
-  letter-spacing: 0.08em;
-  animation: hintPulse 2s ease-in-out infinite;
-}
-
-@keyframes hintPulse {
-  0%, 100% { opacity: 0.42; transform: translateY(0); }
-  50% { opacity: 0.95; transform: translateY(-2px); }
-}
-
-.splash-fade-enter-active,
 .splash-fade-leave-active {
-  transition: opacity 0.52s ease;
+  transition: opacity 0.45s ease;
 }
-
-.splash-fade-enter-from,
 .splash-fade-leave-to {
   opacity: 0;
-}
-
-@media (max-width: 768px) {
-  .intro-card {
-    top: 10%;
-    width: calc(100% - 56px);
-    box-sizing: border-box;
-  }
-
-  .intro-card h1 { font-size: 24px; }
-  .splash-close { top: 24px; right: 24px; }
-  .main-goal {
-    width: 86vw;
-    height: 48vw;
-    top: 52%;
-  }
-  .splash-ball-wrap {
-    width: 112px;
-    height: 112px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ball-fly-in,
-  .ball-center,
-  .ball-out,
-  .football-3d,
-  .particle,
-  .grass-blade,
-  .trail-dot,
-  .ball-ring,
-  .splash-hint,
-  .curve-path,
-  .main-goal.goal-hit .goal-grid,
-  .main-goal.goal-hit .goal-impact {
-    animation: none !important;
-  }
-
-  .splash-ball-wrap {
-    opacity: 1;
-    transform: translate3d(0, -3vh, -96px) scale(0.64) !important;
-  }
 }
 </style>

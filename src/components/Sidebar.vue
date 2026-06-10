@@ -51,8 +51,11 @@ defineEmits(['update:modelValue'])
   align-items: center;
   padding: 24px 0;
   flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 /* 右侧发光线 */
 .sidebar::after {

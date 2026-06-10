@@ -6,36 +6,9 @@
       <!-- Hero 左侧 -->
       <div class="hero-block anim-fadeInUp">
         <div class="hero-bg-glow"></div>
-        <!-- 右侧：世界杯关键节点信息卡 -->
-        <div class="hero-info-card">
-          <div class="hic-top">
-            <span class="hic-dot"></span>
-            KEY MOMENTS
-          </div>
-
-          <div class="hic-main">
-            <div class="hic-number">39</div>
-            <div class="hic-main-text">
-              <div class="hic-title">Tournament Days</div>
-              <div class="hic-desc">2026.06.11 – 2026.07.19</div>
-            </div>
-          </div>
-
-          <div class="hic-timeline">
-            <div class="hic-time-item">
-              <span class="hti-label">OPENING</span>
-              <strong>06.11</strong>
-              <em>墨西哥城</em>
-            </div>
-
-            <div class="hic-time-line"></div>
-
-            <div class="hic-time-item">
-              <span class="hti-label">FINAL</span>
-              <strong>07.19</strong>
-              <em>纽约 / 新泽西</em>
-            </div>
-          </div>
+        <!-- 右侧图片 -->
+        <div class="hero-img-wrap">
+          <img src="/images/hero-bg.jpg" alt="2026 FIFA World Cup" class="hero-inner-img" />
         </div>
         <!-- 图片左侧频谱条装饰 -->
         <div class="spectrum-decor">
@@ -74,29 +47,10 @@
         </div>
         <h1 class="hero-title">2026 <span class="title-accent">FIFA</span> World Cup</h1>
         <p class="hero-sub">美国 · 加拿大 · 墨西哥 | 48强 · 104场</p>
-        <!-- 高端倒计时 -->
-        <div class="countdown-premium">
-          <div
-            v-for="item in countdown"
-            :key="item.label"
-            class="cd-card"
-            :class="{ changed: item.changed }"
-          >
-            <div class="cd-card-glow"></div>
-
-            <div class="cd-top-line">
-              <span>{{ cdEnLabel(item.label) }}</span>
-            </div>
-
-            <div class="cd-number-wrap">
-              <span class="cd-num">{{ item.value }}</span>
-              <span class="cd-num-shadow">{{ item.value }}</span>
-            </div>
-
-            <div class="cd-lbl">{{ item.label }}</div>
-
-            <div class="cd-corner cd-corner-lt"></div>
-            <div class="cd-corner cd-corner-rb"></div>
+        <div class="countdown-row">
+          <div v-for="item in countdown" :key="item.label" class="cd-block" :class="{ changed: item.changed }">
+            <span class="cd-num">{{ item.value }}</span>
+            <span class="cd-lbl">{{ item.label }}</span>
           </div>
         </div>
         <!-- 小数据条 -->
@@ -485,16 +439,6 @@ const countdown = ref([
   { label: '分', value: '00', changed: false },
   { label: '秒', value: '00', changed: false },
 ])
-
-function cdEnLabel(label) {
-  const map = {
-    天: 'DAYS',
-    时: 'HOURS',
-    分: 'MINUTES',
-    秒: 'SECONDS'
-  }
-  return map[label] || label
-}
 let cdTimer = null
 function updateCd() {
   const target = new Date('2026-06-12T20:00:00')
@@ -833,164 +777,30 @@ const quotaOpt = ref({
   position: relative;
   overflow: hidden;
 }
-/* Hero 内右侧信息卡 */
-.hero-info-card {
+/* Hero 内右侧图片 */
+.hero-img-wrap {
   position: absolute;
-  right: 36px;
+  right: 28px;
   top: 50%;
   transform: translateY(-50%);
-  width: 310px;
+  width: 260px;
   height: 210px;
-  z-index: 2;
-  border-radius: 20px;
-  padding: 22px;
-  background:
-    linear-gradient(145deg, rgba(15, 35, 75, 0.82), rgba(6, 14, 34, 0.88)),
-    radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.18), transparent 40%);
-  border: 1px solid rgba(34, 211, 238, 0.22);
-  box-shadow:
-    0 18px 45px rgba(0, 0, 0, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
   overflow: hidden;
+  z-index: 1;
   pointer-events: none;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
 }
-
-.hero-info-card::before {
-  content: '';
-  position: absolute;
-  right: -40px;
-  top: -40px;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  background: rgba(34, 211, 238, 0.12);
-  filter: blur(10px);
-  pointer-events: none;
-}
-
-.hero-info-card::after {
-  content: '';
-  position: absolute;
-  left: -40%;
-  top: 0;
-  width: 28%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.12),
-    transparent
-  );
-  transform: skewX(-18deg);
-  animation: hicSweep 5s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes hicSweep {
-  0% {
-    left: -45%;
-    opacity: 0;
-  }
-  22% {
-    opacity: 1;
-  }
-  48% {
-    left: 120%;
-    opacity: 0;
-  }
-  100% {
-    left: 120%;
-    opacity: 0;
-  }
-}
-
-.hic-top {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #22d3ee;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-
-.hic-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #22d3ee;
-  box-shadow: 0 0 12px rgba(34, 211, 238, 0.8);
-}
-
-.hic-main {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 28px;
-}
-
-.hic-number {
-  font-size: 58px;
-  line-height: 1;
-  font-weight: 1000;
-  color: #fbbf24;
-  text-shadow: 0 0 22px rgba(251, 191, 36, 0.35);
-  font-family: 'DIN Alternate', 'Arial Black', 'Microsoft YaHei', sans-serif;
-}
-
-.hic-title {
-  color: #e8ecf1;
-  font-size: 22px;
-  font-weight: 900;
-}
-
-.hic-desc {
-  margin-top: 6px;
-  color: #8fa6c9;
-  font-size: 13px;
-}
-
-.hic-grid {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 26px;
-}
-
-.hic-grid div {
-  padding: 10px 8px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.055);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  text-align: center;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-}
-
-.hic-grid strong {
-  display: block;
-  color: #22d3ee;
-  font-size: 20px;
-  font-weight: 900;
-  font-family: 'DIN Alternate', 'Arial Black', 'Microsoft YaHei', sans-serif;
-}
-
-.hic-grid span {
-  display: block;
-  margin-top: 3px;
-  color: #6b7b92;
-  font-size: 11px;
-  font-weight: 700;
+.hero-inner-img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  filter: saturate(1.1) brightness(0.95);
 }
 /* 频谱条装饰 */
 .spectrum-decor {
   position: absolute;
-  right: 390px;
+  right: 300px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -1107,260 +917,29 @@ const quotaOpt = ref({
 }
 .hero-sub { font-size: 15px; color: #5A6B82; margin-bottom: 24px; }
 
-/* ========== 高端倒计时 ========== */
-.countdown-premium {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin: 24px 0 22px;
-  position: relative;
-  z-index: 3;
+/* 倒计时 */
+.countdown-row { display: flex; gap: 10px; margin-bottom: 20px; }
+.cd-block {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  transition: all 0.3s ease;
 }
-
-.countdown-premium::before {
-  content: '';
-  position: absolute;
-  left: -12px;
-  right: 120px;
-  top: 50%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(34, 211, 238, 0.22),
-    rgba(251, 191, 36, 0.16),
-    transparent
-  );
-  pointer-events: none;
-}
-
-.cd-card {
-  position: relative;
-  width: 96px;
-  height: 96px;
-  border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.025)),
-    radial-gradient(circle at 30% 20%, rgba(34,211,238,0.16), transparent 42%),
-    rgba(11, 23, 52, 0.78);
-  border: 1px solid rgba(98, 170, 255, 0.22);
-  box-shadow:
-    0 12px 34px rgba(0, 0, 0, 0.28),
-    inset 0 1px 0 rgba(255,255,255,0.12),
-    inset 0 -18px 38px rgba(0, 0, 0, 0.16);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transform: translateZ(0);
-  overflow: hidden;
-}
-
-.cd-card::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: linear-gradient(
-    135deg,
-    rgba(34,211,238,0.7),
-    transparent 30%,
-    transparent 68%,
-    rgba(251,191,36,0.38)
-  );
-  opacity: 0.28;
-  pointer-events: none;
-}
-
-.cd-card::after {
-  content: '';
-  position: absolute;
-  left: -80%;
-  top: -40%;
-  width: 60%;
-  height: 180%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,0.18),
-    transparent
-  );
-  transform: rotate(18deg);
-  animation: cdLightSweep 4.2s ease-in-out infinite;
-}
-
-@keyframes cdLightSweep {
-  0% {
-    left: -90%;
-    opacity: 0;
-  }
-  22% {
-    opacity: 1;
-  }
-  46% {
-    left: 130%;
-    opacity: 0;
-  }
-  100% {
-    left: 130%;
-    opacity: 0;
-  }
-}
-
-.cd-card:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.cd-card:nth-child(2) {
-  animation-delay: 0.15s;
-}
-
-.cd-card:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-.cd-card:nth-child(4) {
-  animation-delay: 0.45s;
-}
-
-.cd-card-glow {
-  position: absolute;
-  inset: auto 16px -24px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(34, 211, 238, 0.26);
-  filter: blur(16px);
-  opacity: 0.75;
-}
-
-.cd-top-line {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  top: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.cd-top-line span {
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 1.6px;
-  color: rgba(137, 170, 210, 0.66);
-}
-
-.cd-number-wrap {
-  position: relative;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .cd-num {
-  position: relative;
-  z-index: 2;
-  font-size: 34px;
-  line-height: 1;
-  font-weight: 1000;
-  color: #22d3ee;
-  font-family: 'DIN Alternate', 'Arial Black', 'Microsoft YaHei', sans-serif;
-  letter-spacing: 1px;
+  display: block;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(34,211,238,0.18);
+  border-radius: 12px;
+  padding: 8px 18px;
+  min-width: 62px; text-align: center;
+  font-size: 26px; font-weight: 800; color: #22D3EE;
   font-variant-numeric: tabular-nums;
-  text-shadow:
-    0 0 14px rgba(34, 211, 238, 0.55),
-    0 0 28px rgba(34, 211, 238, 0.18);
+  transition: all 0.3s ease;
 }
-
-.cd-num-shadow {
-  position: absolute;
-  z-index: 1;
-  font-size: 48px;
-  font-weight: 1000;
-  line-height: 1;
-  color: rgba(255, 255, 255, 0.035);
-  transform: translateY(5px) scaleX(1.08);
-  pointer-events: none;
+.cd-block.changed .cd-num {
+  color: #FBBF24;
+  border-color: rgba(251,191,36,0.4);
+  box-shadow: 0 0 14px rgba(251,191,36,0.2);
 }
-
-.cd-lbl {
-  position: absolute;
-  bottom: 12px;
-  font-size: 13px;
-  font-weight: 800;
-  color: rgba(226, 232, 240, 0.64);
-}
-
-.cd-corner {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border-color: rgba(34, 211, 238, 0.42);
-  border-style: solid;
-  pointer-events: none;
-}
-
-.cd-corner-lt {
-  left: 8px;
-  top: 8px;
-  border-width: 1px 0 0 1px;
-  border-radius: 8px 0 0 0;
-}
-
-.cd-corner-rb {
-  right: 8px;
-  bottom: 8px;
-  border-width: 0 1px 1px 0;
-  border-radius: 0 0 8px 0;
-}
-
-.cd-card.changed {
-  border-color: rgba(251, 191, 36, 0.48);
-  box-shadow:
-    0 0 24px rgba(251, 191, 36, 0.26),
-    0 14px 36px rgba(0, 0, 0, 0.32),
-    inset 0 1px 0 rgba(255,255,255,0.18);
-  animation: cdFlipPop 0.34s ease;
-}
-
-.cd-card.changed .cd-num {
-  color: #fbbf24;
-  text-shadow:
-    0 0 16px rgba(251, 191, 36, 0.65),
-    0 0 30px rgba(251, 191, 36, 0.22);
-}
-
-.cd-card.changed .cd-card-glow {
-  background: rgba(251, 191, 36, 0.32);
-}
-
-@keyframes cdFlipPop {
-  0% {
-    transform: translateY(0) scale(1);
-  }
-  42% {
-    transform: translateY(-5px) scale(1.045);
-  }
-  100% {
-    transform: translateY(0) scale(1);
-  }
-}
-
-@media (max-width: 1200px) {
-  .countdown-premium {
-    gap: 10px;
-  }
-
-  .cd-card {
-    width: 82px;
-    height: 88px;
-  }
-
-  .cd-num {
-    font-size: 30px;
-  }
-}
+.cd-lbl { font-size: 12px; color: #4A5568; font-weight: 600; }
 
 /* 小数据条 */
 .mini-stats-row { display: flex; align-items: center; gap: 0; }
@@ -2773,283 +2352,6 @@ const quotaOpt = ref({
 .glove,
 .goalkeeper-glove {
   display: none !important;
-}
-
-
-@media (max-width: 1280px) {
-  .hero-info-card {
-    width: 280px;
-    right: 24px;
-  }
-
-  .hic-number {
-    font-size: 50px;
-  }
-
-  .hic-title {
-    font-size: 20px;
-  }
-
-  .spectrum-decor {
-    right: 340px;
-  }
-}
-
-@media (max-width: 1080px) {
-  .hero-info-card {
-    position: relative;
-    right: auto;
-    top: auto;
-    transform: none;
-    width: 100%;
-    margin-top: 22px;
-  }
-
-  .spectrum-decor {
-    display: none;
-  }
-}
-
-
-/* ===== 右侧关键节点卡片最终修正版：不遮挡、不重复左侧数据 ===== */
-.hero-info-card {
-  position: absolute !important;
-  right: 36px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  width: 330px !important;
-  height: 255px !important;
-  z-index: 2 !important;
-  border-radius: 22px !important;
-  padding: 22px 24px !important;
-  background:
-    linear-gradient(145deg, rgba(15, 35, 75, 0.82), rgba(6, 14, 34, 0.90)),
-    radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.18), transparent 40%) !important;
-  border: 1px solid rgba(34, 211, 238, 0.22) !important;
-  box-shadow:
-    0 18px 45px rgba(0, 0, 0, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-  overflow: hidden !important;
-  pointer-events: none !important;
-}
-
-.hero-info-card::before {
-  content: '' !important;
-  position: absolute !important;
-  right: -44px !important;
-  top: -44px !important;
-  width: 150px !important;
-  height: 150px !important;
-  border-radius: 50% !important;
-  background: rgba(34, 211, 238, 0.12) !important;
-  filter: blur(10px) !important;
-  pointer-events: none !important;
-}
-
-.hero-info-card::after {
-  content: '' !important;
-  position: absolute !important;
-  left: -45% !important;
-  top: 0 !important;
-  width: 30% !important;
-  height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent) !important;
-  transform: skewX(-18deg) !important;
-  animation: hicSweep 5s ease-in-out infinite !important;
-  pointer-events: none !important;
-}
-
-@keyframes hicSweep {
-  0% { left: -45%; opacity: 0; }
-  22% { opacity: 1; }
-  48% { left: 120%; opacity: 0; }
-  100% { left: 120%; opacity: 0; }
-}
-
-.hic-top {
-  position: relative !important;
-  z-index: 2 !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 9px !important;
-  color: #22d3ee !important;
-  font-size: 12px !important;
-  font-weight: 900 !important;
-  letter-spacing: 2.8px !important;
-  line-height: 1 !important;
-}
-
-.hic-dot {
-  width: 8px !important;
-  height: 8px !important;
-  border-radius: 50% !important;
-  background: #22d3ee !important;
-  box-shadow: 0 0 12px rgba(34, 211, 238, 0.8) !important;
-}
-
-.hic-main {
-  position: relative !important;
-  z-index: 2 !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 18px !important;
-  margin-top: 28px !important;
-}
-
-.hic-number {
-  font-size: 64px !important;
-  line-height: 0.95 !important;
-  font-weight: 1000 !important;
-  color: #fbbf24 !important;
-  text-shadow: 0 0 22px rgba(251, 191, 36, 0.35) !important;
-  font-family: 'DIN Alternate', 'Arial Black', 'Microsoft YaHei', sans-serif !important;
-  letter-spacing: -2px !important;
-}
-
-.hic-main-text {
-  min-width: 0 !important;
-}
-
-.hic-title {
-  color: #e8ecf1 !important;
-  font-size: 20px !important;
-  line-height: 1.2 !important;
-  font-weight: 900 !important;
-  max-width: 165px !important;
-}
-
-.hic-desc {
-  margin-top: 8px !important;
-  color: #8fa6c9 !important;
-  font-size: 13px !important;
-  line-height: 1.2 !important;
-  white-space: nowrap !important;
-}
-
-.hic-grid {
-  display: none !important;
-}
-
-.hic-timeline {
-  position: relative !important;
-  z-index: 2 !important;
-  display: grid !important;
-  grid-template-columns: 1fr 30px 1fr !important;
-  align-items: center !important;
-  gap: 8px !important;
-  margin-top: 26px !important;
-}
-
-.hic-time-item {
-  height: 74px !important;
-  padding: 10px 8px !important;
-  border-radius: 15px !important;
-  background: rgba(255, 255, 255, 0.055) !important;
-  border: 1px solid rgba(255, 255, 255, 0.075) !important;
-  text-align: center !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.hti-label {
-  display: block !important;
-  margin-bottom: 5px !important;
-  color: rgba(34, 211, 238, 0.88) !important;
-  font-size: 10px !important;
-  line-height: 1 !important;
-  font-weight: 900 !important;
-  letter-spacing: 1.2px !important;
-}
-
-.hic-time-item strong {
-  display: block !important;
-  color: #fbbf24 !important;
-  font-size: 22px !important;
-  line-height: 1 !important;
-  font-weight: 1000 !important;
-  font-family: 'DIN Alternate', 'Arial Black', 'Microsoft YaHei', sans-serif !important;
-}
-
-.hic-time-item em {
-  display: block !important;
-  margin-top: 7px !important;
-  color: #8fa6c9 !important;
-  font-size: 11px !important;
-  line-height: 1 !important;
-  font-style: normal !important;
-  font-weight: 700 !important;
-  white-space: nowrap !important;
-}
-
-.hic-time-line {
-  height: 1px !important;
-  background: linear-gradient(90deg, rgba(34,211,238,0.1), rgba(34,211,238,0.75), rgba(34,211,238,0.1)) !important;
-  position: relative !important;
-}
-
-.hic-time-line::before,
-.hic-time-line::after {
-  content: '' !important;
-  position: absolute !important;
-  top: 50% !important;
-  width: 6px !important;
-  height: 6px !important;
-  border-radius: 50% !important;
-  background: #22d3ee !important;
-  box-shadow: 0 0 10px rgba(34,211,238,0.7) !important;
-  transform: translateY(-50%) !important;
-}
-
-.hic-time-line::before {
-  left: -2px !important;
-}
-
-.hic-time-line::after {
-  right: -2px !important;
-}
-
-@media (max-width: 1280px) {
-  .hero-info-card {
-    right: 24px !important;
-    width: 305px !important;
-    height: 246px !important;
-    padding: 20px 22px !important;
-  }
-
-  .hic-number {
-    font-size: 56px !important;
-  }
-
-  .hic-title {
-    font-size: 18px !important;
-  }
-
-  .hic-time-item {
-    height: 68px !important;
-  }
-
-  .spectrum-decor {
-    right: 340px !important;
-  }
-}
-
-@media (max-width: 1080px) {
-  .hero-info-card {
-    position: relative !important;
-    right: auto !important;
-    top: auto !important;
-    transform: none !important;
-    width: 100% !important;
-    height: auto !important;
-    margin-top: 22px !important;
-  }
-
-  .spectrum-decor {
-    display: none !important;
-  }
 }
 
 </style>
