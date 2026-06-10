@@ -1,0 +1,138 @@
+{
+  "groups": [
+    {
+      "group": "A",
+      "teams": [
+        { "code": "mx", "name": "墨西哥", "p": 3, "w": 2, "d": 1, "l": 0, "gf": 5, "ga": 2, "gd": 3, "pts": 7 },
+        { "code": "us", "name": "美国", "p": 3, "w": 2, "d": 0, "l": 1, "gf": 4, "ga": 2, "gd": 2, "pts": 6 },
+        { "code": "ca", "name": "加拿大", "p": 3, "w": 1, "d": 0, "l": 2, "gf": 3, "ga": 5, "gd": -2, "pts": 3 },
+        { "code": "jp", "name": "日本", "p": 3, "w": 0, "d": 1, "l": 2, "gf": 2, "ga": 5, "gd": -3, "pts": 1 }
+      ]
+    },
+    {
+      "group": "B",
+      "teams": [
+        { "code": "ar", "name": "阿根廷", "p": 3, "w": 3, "d": 0, "l": 0, "gf": 7, "ga": 1, "gd": 6, "pts": 9 },
+        { "code": "fr", "name": "法国", "p": 3, "w": 2, "d": 0, "l": 1, "gf": 5, "ga": 3, "gd": 2, "pts": 6 },
+        { "code": "de", "name": "德国", "p": 3, "w": 1, "d": 1, "l": 1, "gf": 4, "ga": 4, "gd": 0, "pts": 4 },
+        { "code": "kr", "name": "韩国", "p": 3, "w": 0, "d": 1, "l": 2, "gf": 2, "ga": 10, "gd": -8, "pts": 1 }
+      ]
+    },
+    {
+      "group": "C",
+      "teams": [
+        { "code": "es", "name": "西班牙", "p": 3, "w": 2, "d": 1, "l": 0, "gf": 6, "ga": 2, "gd": 4, "pts": 7 },
+        { "code": "pt", "name": "葡萄牙", "p": 3, "w": 2, "d": 0, "l": 1, "gf": 5, "ga": 3, "gd": 2, "pts": 6 },
+        { "code": "de", "name": "德国", "p": 3, "w": 1, "d": 0, "l": 2, "gf": 3, "ga": 5, "gd": -2, "pts": 3 },
+        { "code": "mx", "name": "墨西哥", "p": 3, "w": 0, "d": 1, "l": 2, "gf": 2, "ga": 6, "gd": -4, "pts": 1 }
+      ]
+    },
+    {
+      "group": "D",
+      "teams": [
+        { "code": "gb-eng", "name": "英格兰", "p": 3, "w": 2, "d": 1, "l": 0, "gf": 5, "ga": 1, "gd": 4, "pts": 7 },
+        { "code": "nl", "name": "荷兰", "p": 3, "w": 2, "d": 0, "l": 1, "gf": 6, "ga": 3, "gd": 3, "pts": 6 },
+        { "code": "be", "name": "比利时", "p": 3, "w": 1, "d": 0, "l": 2, "gf": 3, "ga": 5, "gd": -2, "pts": 3 },
+        { "code": "dk", "name": "丹麦", "p": 3, "w": 0, "d": 1, "l": 2, "gf": 2, "ga": 7, "gd": -5, "pts": 1 }
+      ]
+    },
+    {
+      "group": "E",
+      "teams": [
+        { "code": "uy", "name": "乌拉圭", "p": 3, "w": 2, "d": 1, "l": 0, "gf": 5, "ga": 2, "gd": 3, "pts": 7 },
+        { "code": "hr", "name": "克罗地亚", "p": 3, "w": 1, "d": 2, "l": 0, "gf": 4, "ga": 3, "gd": 1, "pts": 5 },
+        { "code": "rs", "name": "塞尔维亚", "p": 3, "w": 1, "d": 0, "l": 2, "gf": 3, "ga": 5, "gd": -2, "pts": 3 },
+        { "code": "ch", "name": "瑞士", "p": 3, "w": 0, "d": 1, "l": 2, "gf": 2, "ga": 4, "gd": -2, "pts": 1 }
+      ]
+    },
+    {
+      "group": "F",
+      "teams": [
+        { "code": "it", "name": "意大利", "p": 3, "w": 3, "d": 0, "l": 0, "gf": 6, "ga": 1, "gd": 5, "pts": 9 },
+        { "code": "se", "name": "瑞典", "p": 3, "w": 1, "d": 1, "l": 1, "gf": 3, "ga": 3, "gd": 0, "pts": 4 },
+        { "code": "dk", "name": "丹麦", "p": 3, "w": 1, "d": 1, "l": 1, "gf": 3, "ga": 4, "gd": -1, "pts": 4 },
+        { "code": "at", "name": "奥地利", "p": 3, "w": 0, "d": 2, "l": 1, "gf": 2, "ga": 6, "gd": -4, "pts": 2 }
+      ]
+    },
+    {
+      "group": "G",
+      "teams": [
+        { "code": "co", "name": "哥伦比亚", "p": 3, "w": 2, "d": 1, "l": 0, "gf": 6, "ga": 2, "gd": 4, "pts": 7 },
+        { "code": "ma", "name": "摩洛哥", "p": 3, "w": 2, "d": 0, "l": 1, "gf": 4, "ga": 3, "gd": 1, "pts": 6 },
+        { "code": "jp", "name": "日本", "p": 3, "w": 1, "d": 0, "l": 2, "gf": 3, "ga": 5, "gd": -2, "pts": 3 },
+        { "code": "ng", "name": "尼日利亚", "p": 3, "w": 0, "d": 1, "l": 2, "gf": 2, "ga": 5, "gd": -3, "pts": 1 }
+      ]
+    },
+    {
+      "group": "H",
+      "teams": [
+        { "code": "kr", "name": "韩国", "p": 3, "w": 2, "d": 1, "l": 0, "gf": 5, "ga": 2, "gd": 3, "pts": 7 },
+        { "code": "sn", "name": "塞内加尔", "p": 3, "w": 1, "d": 1, "l": 1, "gf": 3, "ga": 3, "gd": 0, "pts": 4 },
+        { "code": "ir", "name": "伊朗", "p": 3, "w": 1, "d": 0, "l": 2, "gf": 3, "ga": 5, "gd": -2, "pts": 3 },
+        { "code": "gh", "name": "加纳", "p": 3, "w": 0, "d": 2, "l": 1, "gf": 2, "ga": 3, "gd": -1, "pts": 2 }
+      ]
+    },
+    {
+      "group": "I",
+      "teams": [
+        { "code": "pl", "name": "波兰", "p": 3, "w": 2, "d": 0, "l": 1, "gf": 5, "ga": 3, "gd": 2, "pts": 6 },
+        { "code": "ua", "name": "乌克兰", "p": 3, "w": 2, "d": 0, "l": 1, "gf": 4, "ga": 3, "gd": 1, "pts": 6 },
+        { "code": "at", "name": "奥地利", "p": 3, "w": 1, "d": 1, "l": 1, "gf": 3, "ga": 3, "gd": 0, "pts": 4 },
+        { "code": "tn", "name": "突尼斯", "p": 3, "w": 0, "d": 1, "l": 2, "gf": 1, "ga": 4, "gd": -3, "pts": 1 }
+      ]
+    },
+    {
+      "group": "J",
+      "teams": [
+        { "code": "cl", "name": "智利", "p": 3, "w": 2, "d": 1, "l": 0, "gf": 5, "ga": 2, "gd": 3, "pts": 7 },
+        { "code": "pe", "name": "秘鲁", "p": 3, "w": 1, "d": 2, "l": 0, "gf": 3, "ga": 2, "gd": 1, "pts": 5 },
+        { "code": "cm", "name": "喀麦隆", "p": 3, "w": 1, "d": 0, "l": 2, "gf": 3, "ga": 5, "gd": -2, "pts": 3 },
+        { "code": "au", "name": "澳大利亚", "p": 3, "w": 0, "d": 1, "l": 2, "gf": 2, "ga": 4, "gd": -2, "pts": 1 }
+      ]
+    },
+    {
+      "group": "K",
+      "teams": [
+        { "code": "sa", "name": "沙特", "p": 3, "w": 1, "d": 1, "l": 1, "gf": 3, "ga": 4, "gd": -1, "pts": 4 },
+        { "code": "cm", "name": "喀麦隆", "p": 3, "w": 1, "d": 1, "l": 1, "gf": 4, "ga": 4, "gd": 0, "pts": 4 },
+        { "code": "au", "name": "澳大利亚", "p": 3, "w": 1, "d": 1, "l": 1, "gf": 3, "ga": 3, "gd": 0, "pts": 4 },
+        { "code": "ec", "name": "厄瓜多尔", "p": 3, "w": 1, "d": 1, "l": 1, "gf": 3, "ga": 2, "gd": 1, "pts": 4 }
+      ]
+    },
+    {
+      "group": "L",
+      "teams": [
+        { "code": "cr", "name": "哥斯达黎加", "p": 3, "w": 2, "d": 0, "l": 1, "gf": 4, "ga": 3, "gd": 1, "pts": 6 },
+        { "code": "gh", "name": "加纳", "p": 3, "w": 2, "d": 0, "l": 1, "gf": 4, "ga": 3, "gd": 1, "pts": 6 },
+        { "code": "ec", "name": "厄瓜多尔", "p": 3, "w": 1, "d": 0, "l": 2, "gf": 3, "ga": 4, "gd": -1, "pts": 3 },
+        { "code": "py", "name": "巴拉圭", "p": 3, "w": 0, "d": 0, "l": 3, "gf": 1, "ga": 5, "gd": -4, "pts": 0 }
+      ]
+    }
+  ],
+  "rounds": [
+    { "round": 1, "results": [
+      {"group":"A","home":"mx","away":"ca","hg":2,"ag":1},
+      {"group":"A","home":"us","away":"jp","hg":2,"ag":0},
+      {"group":"B","home":"ar","away":"kr","hg":3,"ag":0},
+      {"group":"B","home":"fr","away":"de","hg":2,"ag":1},
+      {"group":"C","home":"es","away":"pt","hg":2,"ag":1},
+      {"group":"D","home":"gb-eng","away":"dk","hg":3,"ag":0}
+    ]},
+    { "round": 2, "results": [
+      {"group":"A","home":"mx","away":"jp","hg":1,"ag":1},
+      {"group":"A","home":"us","away":"ca","hg":1,"ag":2},
+      {"group":"B","home":"ar","away":"de","hg":2,"ag":1},
+      {"group":"B","home":"fr","away":"kr","hg":2,"ag":0},
+      {"group":"C","home":"es","away":"de","hg":3,"ag":1},
+      {"group":"D","home":"gb-eng","away":"be","hg":1,"ag":1}
+    ]},
+    { "round": 3, "results": [
+      {"group":"A","home":"mx","away":"us","hg":2,"ag":1},
+      {"group":"A","home":"ca","away":"jp","hg":0,"ag":1},
+      {"group":"B","home":"ar","away":"fr","hg":2,"ag":1},
+      {"group":"B","home":"de","away":"kr","hg":2,"ag":2},
+      {"group":"C","home":"pt","away":"de","hg":2,"ag":0},
+      {"group":"D","home":"nl","away":"be","hg":3,"ag":1}
+    ]}
+  ]
+}

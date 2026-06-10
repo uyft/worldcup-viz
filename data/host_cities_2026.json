@@ -1,0 +1,18 @@
+[
+  {"city":"New York/New Jersey","country":"USA","lat":40.71,"lon":-74.01,"stadium":"MetLife Stadium","matches":8},
+  {"city":"Los Angeles","country":"USA","lat":34.05,"lon":-118.24,"stadium":"SoFi Stadium","matches":8},
+  {"city":"Dallas","country":"USA","lat":32.78,"lon":-96.80,"stadium":"AT&T Stadium","matches":9},
+  {"city":"Miami","country":"USA","lat":25.76,"lon":-80.19,"stadium":"Hard Rock Stadium","matches":7},
+  {"city":"Atlanta","country":"USA","lat":33.75,"lon":-84.39,"stadium":"Mercedes-Benz Stadium","matches":8},
+  {"city":"Houston","country":"USA","lat":29.76,"lon":-95.37,"stadium":"NRG Stadium","matches":7},
+  {"city":"Philadelphia","country":"USA","lat":39.95,"lon":-75.17,"stadium":"Lincoln Financial Field","matches":6},
+  {"city":"Seattle","country":"USA","lat":47.61,"lon":-122.33,"stadium":"Lumen Field","matches":6},
+  {"city":"San Francisco Bay","country":"USA","lat":37.44,"lon":-122.16,"stadium":"Levi's Stadium","matches":6},
+  {"city":"Boston","country":"USA","lat":42.34,"lon":-71.10,"stadium":"Gillette Stadium","matches":6},
+  {"city":"Kansas City","country":"USA","lat":39.05,"lon":-94.58,"stadium":"Arrowhead Stadium","matches":6},
+  {"city":"Toronto","country":"Canada","lat":43.65,"lon":-79.38,"stadium":"BMO Field","matches":6},
+  {"city":"Vancouver","country":"Canada","lat":49.28,"lon":-123.12,"stadium":"BC Place","matches":6},
+  {"city":"Mexico City","country":"Mexico","lat":19.43,"lon":-99.13,"stadium":"Estadio Azteca","matches":8},
+  {"city":"Guadalajara","country":"Mexico","lat":20.67,"lon":-103.35,"stadium":"Estadio Akron","matches":6},
+  {"city":"Monterrey","country":"Mexico","lat":25.69,"lon":-100.32,"stadium":"Estadio BBVA","matches":6}
+]
