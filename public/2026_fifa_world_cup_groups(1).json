@@ -1,0 +1,275 @@
+{
+  "tournament": "2026 FIFA World Cup",
+  "host_countries": [
+    "United States",
+    "Canada",
+    "Mexico"
+  ],
+  "groups": {
+    "A": [
+      {
+        "position": 1,
+        "team_en": "Mexico",
+        "team_zh": "墨西哥"
+      },
+      {
+        "position": 2,
+        "team_en": "South Africa",
+        "team_zh": "南非"
+      },
+      {
+        "position": 3,
+        "team_en": "South Korea",
+        "team_zh": "韩国"
+      },
+      {
+        "position": 4,
+        "team_en": "Czechia",
+        "team_zh": "捷克"
+      }
+    ],
+    "B": [
+      {
+        "position": 1,
+        "team_en": "Canada",
+        "team_zh": "加拿大"
+      },
+      {
+        "position": 2,
+        "team_en": "Bosnia and Herzegovina",
+        "team_zh": "波黑"
+      },
+      {
+        "position": 3,
+        "team_en": "Qatar",
+        "team_zh": "卡塔尔"
+      },
+      {
+        "position": 4,
+        "team_en": "Switzerland",
+        "team_zh": "瑞士"
+      }
+    ],
+    "C": [
+      {
+        "position": 1,
+        "team_en": "Brazil",
+        "team_zh": "巴西"
+      },
+      {
+        "position": 2,
+        "team_en": "Morocco",
+        "team_zh": "摩洛哥"
+      },
+      {
+        "position": 3,
+        "team_en": "Haiti",
+        "team_zh": "海地"
+      },
+      {
+        "position": 4,
+        "team_en": "Scotland",
+        "team_zh": "苏格兰"
+      }
+    ],
+    "D": [
+      {
+        "position": 1,
+        "team_en": "United States",
+        "team_zh": "美国"
+      },
+      {
+        "position": 2,
+        "team_en": "Paraguay",
+        "team_zh": "巴拉圭"
+      },
+      {
+        "position": 3,
+        "team_en": "Australia",
+        "team_zh": "澳大利亚"
+      },
+      {
+        "position": 4,
+        "team_en": "Türkiye",
+        "team_zh": "土耳其"
+      }
+    ],
+    "E": [
+      {
+        "position": 1,
+        "team_en": "Germany",
+        "team_zh": "德国"
+      },
+      {
+        "position": 2,
+        "team_en": "Curaçao",
+        "team_zh": "库拉索"
+      },
+      {
+        "position": 3,
+        "team_en": "Côte d’Ivoire",
+        "team_zh": "科特迪瓦"
+      },
+      {
+        "position": 4,
+        "team_en": "Ecuador",
+        "team_zh": "厄瓜多尔"
+      }
+    ],
+    "F": [
+      {
+        "position": 1,
+        "team_en": "Netherlands",
+        "team_zh": "荷兰"
+      },
+      {
+        "position": 2,
+        "team_en": "Japan",
+        "team_zh": "日本"
+      },
+      {
+        "position": 3,
+        "team_en": "Sweden",
+        "team_zh": "瑞典"
+      },
+      {
+        "position": 4,
+        "team_en": "Tunisia",
+        "team_zh": "突尼斯"
+      }
+    ],
+    "G": [
+      {
+        "position": 1,
+        "team_en": "Belgium",
+        "team_zh": "比利时"
+      },
+      {
+        "position": 2,
+        "team_en": "Egypt",
+        "team_zh": "埃及"
+      },
+      {
+        "position": 3,
+        "team_en": "Iran",
+        "team_zh": "伊朗"
+      },
+      {
+        "position": 4,
+        "team_en": "New Zealand",
+        "team_zh": "新西兰"
+      }
+    ],
+    "H": [
+      {
+        "position": 1,
+        "team_en": "Spain",
+        "team_zh": "西班牙"
+      },
+      {
+        "position": 2,
+        "team_en": "Cabo Verde",
+        "team_zh": "佛得角"
+      },
+      {
+        "position": 3,
+        "team_en": "Saudi Arabia",
+        "team_zh": "沙特阿拉伯"
+      },
+      {
+        "position": 4,
+        "team_en": "Uruguay",
+        "team_zh": "乌拉圭"
+      }
+    ],
+    "I": [
+      {
+        "position": 1,
+        "team_en": "France",
+        "team_zh": "法国"
+      },
+      {
+        "position": 2,
+        "team_en": "Senegal",
+        "team_zh": "塞内加尔"
+      },
+      {
+        "position": 3,
+        "team_en": "Iraq",
+        "team_zh": "伊拉克"
+      },
+      {
+        "position": 4,
+        "team_en": "Norway",
+        "team_zh": "挪威"
+      }
+    ],
+    "J": [
+      {
+        "position": 1,
+        "team_en": "Argentina",
+        "team_zh": "阿根廷"
+      },
+      {
+        "position": 2,
+        "team_en": "Algeria",
+        "team_zh": "阿尔及利亚"
+      },
+      {
+        "position": 3,
+        "team_en": "Austria",
+        "team_zh": "奥地利"
+      },
+      {
+        "position": 4,
+        "team_en": "Jordan",
+        "team_zh": "约旦"
+      }
+    ],
+    "K": [
+      {
+        "position": 1,
+        "team_en": "Portugal",
+        "team_zh": "葡萄牙"
+      },
+      {
+        "position": 2,
+        "team_en": "DR Congo",
+        "team_zh": "刚果民主共和国"
+      },
+      {
+        "position": 3,
+        "team_en": "Uzbekistan",
+        "team_zh": "乌兹别克斯坦"
+      },
+      {
+        "position": 4,
+        "team_en": "Colombia",
+        "team_zh": "哥伦比亚"
+      }
+    ],
+    "L": [
+      {
+        "position": 1,
+        "team_en": "England",
+        "team_zh": "英格兰"
+      },
+      {
+        "position": 2,
+        "team_en": "Croatia",
+        "team_zh": "克罗地亚"
+      },
+      {
+        "position": 3,
+        "team_en": "Ghana",
+        "team_zh": "加纳"
+      },
+      {
+        "position": 4,
+        "team_en": "Panama",
+        "team_zh": "巴拿马"
+      }
+    ]
+  },
+  "source_url": "https://www.britannica.com/sports/2026-FIFA-World-Cup-Teams"
+}
