@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx vite *)",
+      "Bash(Select-String -Pattern \"error|Error|✓ built|failed\")",
+      "Bash(Start-Sleep -Seconds 3)",
+      "Bash(Get-Content \"C:\\\\Users\\\\Lee\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d----------worldcup-viz\\\\5442041a-c1a1-41a4-8ba1-8ad88d54df26\\\\tasks\\\\b3ug0x2pd.output\" -Tail 20)",
+      "Read(//d/.claude/**)",
+      "Read(//d//**)",
+      "Read(//c/Users/Lee/AppData/Local/Temp/**)",
+      "Bash(node \"D:\\\\vision.js\" \"C:\\\\Users\\\\Lee\\\\AppData\\\\Local\\\\Temp\\\\codex-clipboard-47ddaf6e-11d3-4801-8c98-9a899b9a5811.png\" \"详细描述这张图片里的所有内容，包括布局、文字、图表、按钮等\")",
+      "Bash(node \"D:\\\\vision.js\" \"C:\\\\Users\\\\Lee\\\\AppData\\\\Local\\\\Temp\\\\codex-clipboard-ad636f29-e2ec-4c5a-8836-753f79c8f8ef.png\" \"详细描述这张图片里的所有内容，包括布局、文字、图表、按钮等\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const path = require\\('path'\\); const dir = 'C:/Users/Lee/AppData/Local/Temp'; const files = fs.readdirSync\\(dir\\).filter\\(f => f.endsWith\\('.png'\\) || f.endsWith\\('.jpg'\\)\\).map\\(f => \\({name: f, mtime: fs.statSync\\(path.join\\(dir, f\\)\\).mtime}\\)\\).sort\\(\\(a,b\\) => b.mtime - a.mtime\\).slice\\(0, 15\\); files.forEach\\(f => console.log\\(f.mtime.toISOString\\(\\), f.name\\)\\)\")",
+      "Bash(node \"D:\\\\vision.js\" \"C:\\\\Users\\\\Lee\\\\AppData\\\\Local\\\\Temp\\\\b3dd0edf-818e-4862-9a38-5812bb6cc399_one.png\" \"详细描述这张图片里的所有内容，包括布局、文字、图表、按钮、颜色等每一个细节，不要遗漏任何东西\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const path = require\\('path'\\); const dir = 'C:/Users/Lee/AppData/Local/Temp'; const files = fs.readdirSync\\(dir\\).filter\\(f => f.startsWith\\('codex-clipboard'\\) || f.endsWith\\('one.png'\\)\\).map\\(f => \\({name: f, mtime: fs.statSync\\(path.join\\(dir, f\\)\\).mtime}\\)\\).sort\\(\\(a,b\\) => b.mtime - a.mtime\\).slice\\(0, 5\\); files.forEach\\(f => console.log\\(f.mtime.toISOString\\(\\), f.name\\)\\)\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const path = require\\('path'\\); const dir = 'C:/Users/Lee/AppData/Local/Temp'; const files = fs.readdirSync\\(dir\\).filter\\(f => /\\\\.\\(png|jpg|jpeg\\)$/i.test\\(f\\)\\).map\\(f => \\({name: f, size: fs.statSync\\(path.join\\(dir, f\\)\\).size, mtime: fs.statSync\\(path.join\\(dir, f\\)\\).mtime}\\)\\).sort\\(\\(a,b\\) => b.mtime - a.mtime\\).slice\\(0, 15\\); files.forEach\\(f => console.log\\(f.mtime.toISOString\\(\\), f.size, f.name\\)\\)\")",
+      "Bash(node \"D:\\\\vision.js\" \"C:\\\\Users\\\\Lee\\\\AppData\\\\Local\\\\Temp\\\\SLBPopbkImagetemp.png\" \"详细描述这张图片里的所有内容，包括布局、文字、图表、按钮、颜色、数据等每一个细节\")"
+    ]
+  }
+}

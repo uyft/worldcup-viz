@@ -201,70 +201,135 @@
     <PeekCarousel />
 
     <!-- ===== 冠军历史卡片横排 ===== -->
-    <div class="section-head anim-fadeInUp delay-3">
-      <h2 class="sec-title">🏆 历届冠军</h2>
-      <span class="sec-badge gold">1930 – 2022</span>
-    </div>
-    <div class="champions-scroll anim-fadeInUp delay-3">
-      <div v-for="(c, i) in allChampions" :key="c.year"
-        class="champ-card" :style="{ '--cc-hue': c.hue }">
-        <div class="cc-year">{{ c.year }}</div>
-        <img :src="`https://flagcdn.com/48x36/${c.code}.png`"
-          :alt="c.name" class="cc-flag"
-          @error="($event.target).style.display='none'" />
-        <div class="cc-name">{{ c.name }}</div>
-        <div class="cc-host">{{ c.host }}</div>
-        <div class="cc-glow-line"></div>
+    <div class="section-wrapper section-gold">
+      <div class="section-ambient-glow"></div>
+      <div class="section-head anim-fadeInUp delay-3">
+        <div class="sec-accent-line"></div>
+        <h2 class="sec-title">🏆 历届冠军</h2>
+        <span class="sec-badge gold">1930 – 2022</span>
+      </div>
+      <div class="champions-scroll anim-fadeInUp delay-3">
+        <div v-for="(c, i) in allChampions" :key="c.year"
+          class="champ-card" :style="{ '--cc-hue': c.hue }">
+          <div class="cc-year">{{ c.year }}</div>
+          <img :src="`https://flagcdn.com/48x36/${c.code}.png`"
+            :alt="c.name" class="cc-flag"
+            @error="($event.target).style.display='none'" />
+          <div class="cc-name">{{ c.name }}</div>
+          <div class="cc-host">{{ c.host }}</div>
+          <div class="cc-glow-line"></div>
+        </div>
       </div>
     </div>
 
+    <!-- 装饰分隔线 -->
+    <div class="section-divider"><span class="divider-diamond"></span></div>
+
     <!-- ===== 三列图表区：进球折线 + 洲际饼图 + 夺冠热门 ===== -->
-    <div class="triple-grid anim-fadeInUp delay-4">
-      <!-- 左：历届进球折线 -->
+    <div class="section-wrapper section-cyan">
+      <div class="section-ambient-glow"></div>
+      <div class="triple-grid anim-fadeInUp delay-4">
+      <!-- 左：历届进球折线（增强版） -->
       <div class="card chart-panel">
         <div class="panel-head">
           <span class="panel-title">历届总进球趋势</span>
-          <span class="panel-sub">1930–2022</span>
+          <div class="goals-toggle-group">
+            <button class="goals-toggle-btn" :class="{ active: goalsMode === 'total' }" @click="switchGoalsMode('total')">总进球</button>
+            <button class="goals-toggle-btn" :class="{ active: goalsMode === 'avg' }" @click="switchGoalsMode('avg')">场均</button>
+          </div>
         </div>
         <div class="chart-wrap">
-          <v-chart :option="goalsOpt" autoresize />
+          <v-chart :option="goalsOpt" autoresize @zr:click="onGoalsClick" />
         </div>
       </div>
 
-      <!-- 中：洲际配额饼图 -->
+      <!-- 中：洲际配额饼图（增强版） -->
       <div class="card chart-panel">
         <div class="panel-head">
           <span class="panel-title">洲际参赛名额</span>
-          <span class="panel-sub">2026 分配方案</span>
+          <div class="goals-toggle-group">
+            <button class="goals-toggle-btn" :class="{ active: quotaYear === 2026 }" @click="switchQuotaYear(2026)">2026</button>
+            <button class="goals-toggle-btn" :class="{ active: quotaYear === 2022 }" @click="switchQuotaYear(2022)">2022</button>
+          </div>
         </div>
-        <div class="chart-wrap">
-          <v-chart :option="quotaOpt" autoresize />
+        <div class="chart-wrap" style="position:relative">
+          <v-chart :option="quotaOpt" autoresize @click="onQuotaClick" />
+          <div class="pie-center-text">
+            <span class="pct-num">{{ quotaYear === 2026 ? 48 : 32 }}</span>
+            <span class="pct-label">总名额</span>
+          </div>
         </div>
+        <Transition name="slide-up">
+          <div v-if="quotaDetail" class="quota-detail-card">
+            <div class="qdc-header">
+              <span class="qdc-dot" :style="{ background: quotaDetail.color }"></span>
+              <span>{{ quotaDetail.name }}</span>
+              <button class="qdc-close" @click="quotaDetail = null">×</button>
+            </div>
+            <div class="qdc-body">
+              <span>参赛名额：<strong>{{ quotaDetail.value }} 席</strong></span>
+              <span>占比：<strong>{{ quotaDetail.pct }}%</strong></span>
+              <span v-if="quotaDetail.change !== undefined" :class="quotaDetail.change >= 0 ? 'qdc-up' : 'qdc-down'">
+                {{ quotaDetail.change >= 0 ? '+' : '' }}{{ quotaDetail.change }} 席 vs 2022
+              </span>
+            </div>
+          </div>
+        </Transition>
       </div>
 
-      <!-- 右：夺冠热门预测 -->
-      <div class="card hot-panel">
+      <!-- 右：夺冠热门预测（增强版） -->
+      <div class="card hot-panel" :class="{ expanded: hotExpanded }">
         <div class="panel-head">
           <span class="panel-title">🔥 夺冠热门</span>
-          <span class="panel-sub">预测胜率</span>
+          <div class="hot-head-actions">
+            <span class="panel-sub">预测胜率</span>
+            <button class="hot-shuffle-btn" @click="shuffleHotTeams" title="模拟抽签爆冷">🎲 模拟抽签</button>
+          </div>
         </div>
         <div class="hot-list">
-          <div v-for="(h, i) in hotTeams" :key="h.name" class="hot-row" :class="{ 'top1': i === 0 }">
-            <span class="hot-rank" :class="['hr1','hr2','hr3'][i] || 'hrn'">{{ i + 1 }}</span>
+          <div
+            v-for="(h, i) in hotTeamsDisplay"
+            :key="h.name"
+            class="hot-row"
+            :class="{ 'top1': i === 0, 'selected': selectedHotTeam?.name === h.name }"
+            @click="selectHotTeam(h)"
+          >
+            <span class="hot-rank" :class="['hr1','hr2','hr3'][i] || 'hrn'">{{ h.rank }}</span>
             <img :src="`https://flagcdn.com/32x24/${h.code}.png`" class="hot-flag" :alt="h.name"
               @error="($event.target).style.display='none'" />
             <span class="hot-name">{{ h.name }}</span>
             <div class="hot-bar-wrap">
-              <div class="hot-bar" :style="{ width: h.pct + '%', background: hotBarBg(i) }"></div>
+              <div class="hot-bar" :style="{ width: h.displayPct + '%', background: hotBarBg(i) }"></div>
             </div>
-            <span class="hot-pct" :class="{ 'gold-text': i === 0 }">{{ h.pct }}%</span>
+            <span class="hot-trend" v-if="h.trend !== 0" :class="h.trend > 0 ? 'trend-up' : 'trend-down'">
+              {{ h.trend > 0 ? '↑' : '↓' }}{{ Math.abs(h.trend) }}
+            </span>
+            <span class="hot-pct" :class="{ 'gold-text': i === 0 }">{{ animatedPct(h) }}%</span>
           </div>
         </div>
+        <!-- 展开雷达图 -->
+        <Transition name="slide-down">
+          <div v-if="selectedHotTeam" class="radar-panel">
+            <div class="radar-header">
+              <span>📊 {{ selectedHotTeam.name }} 六维战力</span>
+              <button class="qdc-close" @click.stop="selectedHotTeam = null">×</button>
+            </div>
+            <div class="chart-wrap radar-wrap">
+              <v-chart :option="radarOpt" autoresize />
+            </div>
+          </div>
+        </Transition>
       </div>
     </div>
+    </div>
+
+    <!-- 装饰分隔线 -->
+    <div class="section-divider"><span class="divider-diamond"></span></div>
 
     <!-- ===== 双栏：冠军榜 + 焦点对决 ===== -->
-    <div class="dual-grid anim-fadeInUp delay-5">
+    <div class="section-wrapper section-mixed">
+      <div class="section-ambient-glow"></div>
+      <div class="dual-grid anim-fadeInUp delay-5">
       <!-- 左：冠军旭日图 -->
       <div class="card chart-panel">
         <div class="panel-head">
@@ -313,13 +378,20 @@
         </div>
       </div>
     </div>
+    </div>
+
+    <!-- 装饰分隔线 -->
+    <div class="section-divider"><span class="divider-diamond"></span></div>
 
     <!-- ===== 进球王名人堂 ===== -->
-    <div class="section-head anim-fadeInUp delay-6">
-      <h2 class="sec-title">⚽ 世界杯进球王名人堂</h2>
-      <span class="sec-badge gold">历史 TOP 射手</span>
-    </div>
-    <div class="legends-scroll anim-fadeInUp delay-6">
+    <div class="section-wrapper section-purple">
+      <div class="section-ambient-glow"></div>
+      <div class="section-head anim-fadeInUp delay-6">
+        <div class="sec-accent-line"></div>
+        <h2 class="sec-title">⚽ 世界杯进球王名人堂</h2>
+        <span class="sec-badge gold">历史 TOP 射手</span>
+      </div>
+      <div class="legends-scroll anim-fadeInUp delay-6">
       <div v-for="(p, i) in legends" :key="p.name" class="legend-card" :style="{ '--lg-hue': p.hue }">
         <div class="lg-rank">{{ i + 1 }}</div>
         <div class="lg-body">
@@ -339,13 +411,20 @@
         </div>
       </div>
     </div>
+    </div>
+
+    <!-- 装饰分隔线 -->
+    <div class="section-divider"><span class="divider-diamond"></span></div>
 
     <!-- ===== 互动小游戏：点球大战 ===== -->
-    <div class="section-head anim-fadeInUp delay-6 penalty-section-head">
-      <h2 class="sec-title">🎮 互动体验区</h2>
-      <span class="sec-badge cyan">点球大战小游戏</span>
-    </div>
-    <div class="penalty-game anim-fadeInUp delay-6">
+    <div class="section-wrapper section-green">
+      <div class="section-ambient-glow"></div>
+      <div class="section-head anim-fadeInUp delay-6 penalty-section-head">
+        <div class="sec-accent-line"></div>
+        <h2 class="sec-title">🎮 互动体验区</h2>
+        <span class="sec-badge cyan">点球大战小游戏</span>
+      </div>
+      <div class="penalty-game anim-fadeInUp delay-6">
       <div class="game-header">
         <div>
           <div class="game-label">Football Mini Game</div>
@@ -443,6 +522,7 @@
         <span>规则：射门方向和守门员方向不同即为进球</span>
       </div>
     </div>
+    </div>
 
 
     <!-- AI解说员 -->
@@ -455,13 +535,13 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import AICommentator from '../components/AICommentator.vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { BarChart, LineChart, PieChart, SunburstChart } from 'echarts/charts'
-import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
+import { BarChart, LineChart, PieChart, SunburstChart, RadarChart } from 'echarts/charts'
+import { GridComponent, TooltipComponent, LegendComponent, DataZoomComponent, MarkPointComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
 import FlagTag from '../components/FlagTag.vue'
 import PeekCarousel from '../components/PeekCarousel.vue'
 
-use([CanvasRenderer, BarChart, LineChart, PieChart, SunburstChart, GridComponent, TooltipComponent, LegendComponent])
+use([CanvasRenderer, BarChart, LineChart, PieChart, SunburstChart, RadarChart, GridComponent, TooltipComponent, LegendComponent, DataZoomComponent, MarkPointComponent])
 
 const emit = defineEmits(['navigate'])
 
@@ -560,17 +640,117 @@ const allChampions = [
   { year:'1978', code:'ar', name:'阿根廷', host:'阿根廷', hue: 185 },
 ]
 
-// ——— 夺冠热门 ———
-const hotTeams = [
-  { name: '巴西', code: 'br', pct: 22 },
-  { name: '法国', code: 'fr', pct: 18 },
-  { name: '阿根廷', code: 'ar', pct: 15 },
-  { name: '英格兰', code: 'gb-eng', pct: 12 },
-  { name: '德国', code: 'de', pct: 10 },
-  { name: '西班牙', code: 'es', pct: 9 },
-  { name: '葡萄牙', code: 'pt', pct: 6 },
-  { name: '荷兰', code: 'nl', pct: 5 },
+// ——— 夺冠热门（增强版） ———
+const hotTeamsRaw = [
+  { name: '巴西', code: 'br', pct: 22, trend: 1, radar: { attack: 94, defense: 82, midfield: 90, experience: 88, form: 80, depth: 92 } },
+  { name: '法国', code: 'fr', pct: 18, trend: 2, radar: { attack: 92, defense: 85, midfield: 88, experience: 82, form: 78, depth: 90 } },
+  { name: '阿根廷', code: 'ar', pct: 15, trend: 0, radar: { attack: 88, defense: 80, midfield: 85, experience: 90, form: 85, depth: 78 } },
+  { name: '英格兰', code: 'gb-eng', pct: 12, trend: -1, radar: { attack: 85, defense: 78, midfield: 82, experience: 75, form: 72, depth: 88 } },
+  { name: '德国', code: 'de', pct: 10, trend: 1, radar: { attack: 82, defense: 84, midfield: 86, experience: 85, form: 76, depth: 85 } },
+  { name: '西班牙', code: 'es', pct: 9, trend: 0, radar: { attack: 80, defense: 76, midfield: 92, experience: 78, form: 82, depth: 80 } },
+  { name: '葡萄牙', code: 'pt', pct: 6, trend: -1, radar: { attack: 86, defense: 79, midfield: 78, experience: 80, form: 84, depth: 70 } },
+  { name: '荷兰', code: 'nl', pct: 5, trend: 1, radar: { attack: 78, defense: 82, midfield: 80, experience: 72, form: 74, depth: 76 } },
 ]
+
+// 交互状态
+const goalsMode = ref('total')
+const quotaYear = ref(2026)
+const quotaDetail = ref(null)
+const selectedHotTeam = ref(null)
+const hotTeamsDisplay = ref([])
+const hotScoreTimers = ref([])
+
+// 初始化 hotTeamsDisplay
+function initHotDisplay(source) {
+  return source.map((h, i) => ({
+    ...h,
+    rank: i + 1,
+    displayPct: 0,  // 从0开始做动画
+  }))
+}
+hotTeamsDisplay.value = initHotDisplay(hotTeamsRaw)
+
+const hotExpanded = computed(() => !!selectedHotTeam.value)
+
+// 胜率数字平滑滚动
+function animatedPct(h) {
+  return Math.round(h.displayPct)
+}
+
+// 进度条 & 数字动画
+function animateHotBars() {
+  hotScoreTimers.value.forEach(t => clearTimeout(t))
+  const timers = []
+  hotTeamsDisplay.value.forEach((h, i) => {
+    // 重置为0再动画
+    h.displayPct = 0
+    const target = h.pct
+    const steps = 40
+    const delay = i * 60 + 200
+    for (let s = 1; s <= steps; s++) {
+      const t = setTimeout(() => {
+        h.displayPct = Math.round(target * (s / steps) * 10) / 10
+        if (s === steps) h.displayPct = target
+      }, delay + s * 18)
+      timers.push(t)
+    }
+  })
+  hotScoreTimers.value = timers
+}
+onMounted(() => { animateHotBars() })
+
+// 点击球队展开雷达图
+function selectHotTeam(h) {
+  if (selectedHotTeam.value?.name === h.name) {
+    selectedHotTeam.value = null
+  } else {
+    selectedHotTeam.value = h
+  }
+}
+
+// 模拟抽签
+function shuffleHotTeams() {
+  const shuffled = [...hotTeamsRaw].sort(() => Math.random() - 0.5)
+  hotTeamsDisplay.value = initHotDisplay(shuffled)
+  selectedHotTeam.value = null
+  // 重新动画
+  setTimeout(() => animateHotBars(), 100)
+}
+
+// 雷达图 computed
+const radarOpt = computed(() => {
+  if (!selectedHotTeam.value) return {}
+  const r = selectedHotTeam.value.radar
+  const labels = ['进攻', '防守', '中场', '经验', '状态', '阵容深度']
+  const values = [r.attack, r.defense, r.midfield, r.experience, r.form, r.depth]
+  return {
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: 'rgba(20,27,45,0.95)',
+      borderColor: 'rgba(34,211,238,0.3)',
+      textStyle: { color: '#E8ECF1' },
+    },
+    legend: { show: true, data: [selectedHotTeam.value.name], bottom: 0, textStyle: { color: '#8892A6' } },
+    radar: {
+      center: ['50%', '48%'],
+      radius: '62%',
+      indicator: labels.map(l => ({ name: l, max: 100 })),
+      axisName: { color: '#8892A6', fontSize: 10 },
+      splitArea: {
+        areaStyle: { color: ['rgba(34,211,238,0.02)', 'rgba(34,211,238,0.04)', 'rgba(34,211,238,0.02)', 'rgba(34,211,238,0.04)', 'rgba(34,211,238,0.02)'] }
+      },
+      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)' } },
+      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } },
+    },
+    series: [{
+      type: 'radar',
+      data: [{ value: values, name: selectedHotTeam.value.name, areaStyle: { color: 'rgba(34,211,238,0.18)' }, lineStyle: { color: '#22D3EE', width: 2 }, itemStyle: { color: '#FBBF24' } }],
+      symbol: 'circle',
+      symbolSize: 4,
+    }]
+  }
+})
+
 function hotBarBg(i) {
   if (i === 0) return 'linear-gradient(90deg, #FBBF24, #F59E0B)'
   if (i === 1) return 'linear-gradient(90deg, #94A3B8, #64748B)'
@@ -580,55 +760,76 @@ function hotBarBg(i) {
 
 // ——— 冠军旭日图 ———
 const sunburstOpt = ref({
-  tooltip: { trigger: 'item', backgroundColor: 'rgba(20,27,45,0.95)', borderColor: 'rgba(255,255,255,0.08)', textStyle: { color: '#E8ECF1' }, formatter: '{b}' },
+  backgroundColor: 'transparent',
+  tooltip: {
+    trigger: 'item',
+    backgroundColor: 'rgba(8,15,32,0.96)',
+    borderColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    padding: [10, 14],
+    textStyle: { color: '#E8ECF1' },
+    extraCssText: 'backdrop-filter: blur(12px); border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);',
+    formatter: (p) => {
+      const colors = { '巴西': '#22D3EE', '德国': '#FBBF24', '意大利': '#F43F5E', '阿根廷': '#34D399', '法国': '#A78BFA', '乌拉圭': '#FB923C', '英格兰': '#E2E8F0', '西班牙': '#38BDF8' }
+      const c = colors[p.name] || '#22D3EE'
+      return `<div style="display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${c};box-shadow:0 0 8px ${c}"></span><b style="color:#E8ECF1">${p.name}</b></div>`
+    }
+  },
   series: [{
     type: 'sunburst',
     radius: [0, '95%'],
     center: ['50%', '50%'],
     sort: null,
-    emphasis: { focus: 'ancestor' },
+    emphasis: {
+      focus: 'ancestor',
+      itemStyle: {
+        shadowBlur: 24,
+        shadowColor: 'rgba(0,0,0,0.5)',
+      },
+      label: { fontWeight: 'bold' }
+    },
     data: [
-      { name: '巴西', itemStyle: { color: '#22D3EE' }, children: [
+      { name: '巴西', itemStyle: { color: '#22D3EE', shadowBlur: 6, shadowColor: 'rgba(34,211,238,0.4)' }, children: [
         { name: '2002', value: 1, itemStyle: { color: '#22D3EE' } },
         { name: '1994', value: 1, itemStyle: { color: '#22D3EE' } },
         { name: '1970', value: 1, itemStyle: { color: '#22D3EE' } },
         { name: '1962', value: 1, itemStyle: { color: '#22D3EE' } },
         { name: '1958', value: 1, itemStyle: { color: '#22D3EE' } },
       ]},
-      { name: '德国', itemStyle: { color: '#FBBF24' }, children: [
+      { name: '德国', itemStyle: { color: '#FBBF24', shadowBlur: 6, shadowColor: 'rgba(251,191,36,0.4)' }, children: [
         { name: '2014', value: 1, itemStyle: { color: '#FBBF24' } },
         { name: '1990', value: 1, itemStyle: { color: '#FBBF24' } },
         { name: '1974', value: 1, itemStyle: { color: '#FBBF24' } },
         { name: '1954', value: 1, itemStyle: { color: '#FBBF24' } },
       ]},
-      { name: '意大利', itemStyle: { color: '#F43F5E' }, children: [
+      { name: '意大利', itemStyle: { color: '#F43F5E', shadowBlur: 6, shadowColor: 'rgba(244,63,94,0.4)' }, children: [
         { name: '2006', value: 1, itemStyle: { color: '#F43F5E' } },
         { name: '1982', value: 1, itemStyle: { color: '#F43F5E' } },
         { name: '1938', value: 1, itemStyle: { color: '#F43F5E' } },
         { name: '1934', value: 1, itemStyle: { color: '#F43F5E' } },
       ]},
-      { name: '阿根廷', itemStyle: { color: '#34D399' }, children: [
+      { name: '阿根廷', itemStyle: { color: '#34D399', shadowBlur: 6, shadowColor: 'rgba(52,211,153,0.4)' }, children: [
         { name: '2022', value: 1, itemStyle: { color: '#34D399' } },
         { name: '1986', value: 1, itemStyle: { color: '#34D399' } },
         { name: '1978', value: 1, itemStyle: { color: '#34D399' } },
       ]},
-      { name: '法国', itemStyle: { color: '#A78BFA' }, children: [
+      { name: '法国', itemStyle: { color: '#A78BFA', shadowBlur: 6, shadowColor: 'rgba(167,139,250,0.4)' }, children: [
         { name: '2018', value: 1, itemStyle: { color: '#A78BFA' } },
         { name: '1998', value: 1, itemStyle: { color: '#A78BFA' } },
       ]},
-      { name: '乌拉圭', itemStyle: { color: '#FB923C' }, children: [
+      { name: '乌拉圭', itemStyle: { color: '#FB923C', shadowBlur: 6, shadowColor: 'rgba(251,146,60,0.4)' }, children: [
         { name: '1950', value: 1, itemStyle: { color: '#FB923C' } },
         { name: '1930', value: 1, itemStyle: { color: '#FB923C' } },
       ]},
-      { name: '英格兰', itemStyle: { color: '#E2E8F0' }, children: [
+      { name: '英格兰', itemStyle: { color: '#E2E8F0', shadowBlur: 6, shadowColor: 'rgba(226,232,240,0.4)' }, children: [
         { name: '1966', value: 1, itemStyle: { color: '#E2E8F0' } },
       ]},
-      { name: '西班牙', itemStyle: { color: '#38BDF8' }, children: [
+      { name: '西班牙', itemStyle: { color: '#38BDF8', shadowBlur: 6, shadowColor: 'rgba(56,189,248,0.4)' }, children: [
         { name: '2010', value: 1, itemStyle: { color: '#38BDF8' } },
       ]},
     ],
     label: { rotate: 'radial', fontSize: 9, color: '#E8ECF1', fontWeight: 600 },
-    itemStyle: { borderColor: '#0B0F1A', borderWidth: 2 },
+    itemStyle: { borderColor: '#0B0F1A', borderWidth: 2, borderRadius: 3 },
     levels: [
       {},
       { r0: '0%', r: '40%', label: { rotate: 'tangential', fontSize: 11, fontWeight: 700 } },
@@ -760,61 +961,487 @@ function resetPenaltyRound() {
   netShaking.value = false
 }
 
-// ——— ECharts：历届进球 ———
-const goalsOpt = ref({
-  tooltip: { trigger: 'axis', backgroundColor: 'rgba(20,27,45,0.95)', borderColor: 'rgba(255,255,255,0.08)', textStyle: { color: '#E8ECF1' } },
-  grid: { left: '4%', right: '4%', bottom: '10%', top: '12px', containLabel: true },
-  xAxis: {
-    type: 'category',
-    data: ['1930','1950','1966','1970','1982','1990','1998','2002','2010','2014','2018','2022'],
-    axisLabel: { color: '#6B7B92', fontSize: 10 },
-    axisLine: { lineStyle: { color: 'rgba(255,255,255,0.06)' } },
-  },
-  yAxis: {
-    type: 'value',
-    axisLabel: { color: '#6B7B92', fontSize: 10 },
-    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
-  },
-  series: [{
-    type: 'line',
-    data: [70, 88, 89, 95, 146, 115, 171, 161, 145, 171, 169, 172],
-    smooth: true,
-    symbol: 'circle', symbolSize: 5,
-    lineStyle: { width: 2.5, color: '#FBBF24' },
-    itemStyle: { color: '#FBBF24' },
-    areaStyle: {
-      color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
-        colorStops: [{ offset: 0, color: 'rgba(251,191,36,0.25)' }, { offset: 1, color: 'rgba(251,191,36,0.01)' }] }
-    }
-  }]
+// ——— 进球历史数据 ———
+const goalsDataTotal = [70, 88, 89, 95, 146, 115, 171, 161, 145, 171, 169, 172]
+const goalsAvgPerMatch = [2.9, 4.0, 3.0, 2.7, 2.8, 2.2, 2.7, 2.5, 2.3, 2.7, 2.6, 2.7]
+const goalsYearLabels = ['1930','1950','1966','1970','1982','1990','1998','2002','2010','2014','2018','2022']
+const goalsChampions = ['乌拉圭','乌拉圭','英格兰','巴西','意大利','西德','法国','巴西','西班牙','德国','法国','阿根廷']
+const goalsTeamCount = [13,13,16,16,24,24,32,32,32,32,32,32]
+const goalsMatchCount = [18,22,32,32,52,52,64,64,64,64,64,64]
+
+// 历史事件标注
+const goalsMarkPoints = [
+  { name: '扩军\n32强', coord: ['1998', 171], symbol: 'roundRect', symbolSize: 14, itemStyle: { color: '#FBBF24' }, label: { color: '#FBBF24', fontSize: 9, fontWeight: 600, distance: 10 } },
+  { name: 'VAR\n首秀', coord: ['2018', 169], symbol: 'diamond', symbolSize: 12, itemStyle: { color: '#22D3EE' }, label: { color: '#22D3EE', fontSize: 9, fontWeight: 600, distance: 10 } },
+]
+
+function switchGoalsMode(mode) {
+  goalsMode.value = mode
+}
+
+// ——— ECharts：历届进球（流光溢彩版） ———
+const goalsOpt = computed(() => {
+  const data = goalsMode.value === 'total' ? goalsDataTotal : goalsAvgPerMatch
+  const unit = goalsMode.value === 'total' ? '球' : '球/场'
+  const yMax = goalsMode.value === 'total' ? 200 : 5
+  const lineColor = goalsMode.value === 'total' ? '#FBBF24' : '#22D3EE'
+  const glowColor = goalsMode.value === 'total' ? 'rgba(251,191,36,' : 'rgba(34,211,238,'
+  return {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(8,15,32,0.96)',
+      borderColor: goalsMode.value === 'total' ? 'rgba(251,191,36,0.5)' : 'rgba(34,211,238,0.5)',
+      borderWidth: 1,
+      padding: [14, 18],
+      textStyle: { color: '#E8ECF1', fontSize: 12 },
+      extraCssText: 'backdrop-filter: blur(12px); border-radius: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);',
+      formatter: (params) => {
+        const p = params[0]
+        const idx = p.dataIndex
+        const accent = goalsMode.value === 'total' ? '#FBBF24' : '#22D3EE'
+        return `<div style="font-size:11px;color:#5A6478;margin-bottom:6px;letter-spacing:1px">FIFA WORLD CUP</div>
+          <div style="font-weight:900;font-size:15px;margin-bottom:10px;color:${accent}">🏆 ${goalsYearLabels[idx]} 年</div>
+          <div style="display:flex;gap:18px;">
+            <div>
+              <div style="color:#6B7B92;font-size:10px;margin-bottom:2px">⚽ ${goalsMode.value === 'total' ? '总进球' : '场均进球'}</div>
+              <div style="font-weight:900;font-size:20px;color:${accent}">${p.value}<span style="font-size:12px;font-weight:500;color:#8892A6"> ${unit}</span></div>
+            </div>
+            <div style="width:1px;background:rgba(255,255,255,0.08)"></div>
+            <div>
+              <div style="color:#6B7B92;font-size:10px;margin-bottom:2px">👑 冠军</div>
+              <div style="font-weight:700;font-size:14px;color:#E8ECF1">${goalsChampions[idx]}</div>
+              <div style="font-size:10px;color:#5A6478">${goalsTeamCount[idx]}队 · ${goalsMatchCount[idx]}场</div>
+            </div>
+          </div>`
+      }
+    },
+    grid: { left: '3%', right: '7%', bottom: '18%', top: '24px', containLabel: true },
+    xAxis: {
+      type: 'category',
+      data: goalsYearLabels,
+      axisLabel: { color: '#5A6B82', fontSize: 10, fontWeight: 600 },
+      axisLine: { show: false },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      max: yMax,
+      axisLabel: { color: '#5A6B82', fontSize: 10, fontWeight: 600 },
+      splitLine: { lineStyle: { color: 'rgba(34,211,238,0.06)', type: 'dashed' } },
+    },
+    dataZoom: [{
+      type: 'slider',
+      show: true,
+      start: 0,
+      end: 100,
+      height: 20,
+      bottom: 0,
+      borderColor: 'rgba(34,211,238,0.15)',
+      backgroundColor: 'rgba(8,12,24,0.7)',
+      fillerColor: 'rgba(34,211,238,0.12)',
+      handleStyle: { color: '#22D3EE', borderColor: '#22D3EE', borderWidth: 2 },
+      textStyle: { color: '#5A6B82', fontSize: 9 },
+      borderRadius: 8,
+    }],
+    series: [{
+      type: 'line',
+      data: data,
+      smooth: 0.4,
+      symbol: 'emptyCircle',
+      symbolSize: 8,
+      showSymbol: true,
+      // === 发光数据点 ===
+      itemStyle: {
+        color: lineColor,
+        borderColor: 'rgba(255,255,255,0.6)',
+        borderWidth: 2,
+        shadowBlur: 14,
+        shadowColor: glowColor + '0.9)',
+      },
+      // === 流光线条 ===
+      lineStyle: {
+        width: 3,
+        color: {
+          type: 'linear', x: 0, y: 0, x2: 1, y2: 0,
+          colorStops: [
+            { offset: 0, color: goalsMode.value === 'total' ? '#22D3EE' : '#FBBF24' },
+            { offset: 0.5, color: lineColor },
+            { offset: 1, color: goalsMode.value === 'total' ? '#F97316' : '#06B6D4' },
+          ]
+        },
+        shadowBlur: 16,
+        shadowColor: glowColor + '0.6)',
+        cap: 'round',
+        join: 'round',
+      },
+      // === 多层光晕面积 ===
+      areaStyle: {
+        color: {
+          type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [
+            { offset: 0, color: glowColor + '0.35)' },
+            { offset: 0.4, color: glowColor + '0.12)' },
+            { offset: 0.7, color: glowColor + '0.03)' },
+            { offset: 1, color: glowColor + '0.00)' },
+          ]
+        },
+        shadowBlur: 20,
+        shadowColor: glowColor + '0.25)',
+      },
+      // === 发光涟漪效果（大直径圆点强调） ===
+      emphasis: {
+        scale: 2.5,
+        focus: 'series',
+        itemStyle: {
+          color: '#fff',
+          borderColor: lineColor,
+          borderWidth: 3,
+          shadowBlur: 30,
+          shadowColor: glowColor + '1)',
+        },
+      },
+      // === 历史标注（仅总进球模式） ===
+      markPoint: goalsMode.value === 'total' ? {
+        data: goalsMarkPoints,
+        symbolOffset: [0, '-40%'],
+        animation: true,
+      } : undefined,
+    }]
+  }
 })
 
-// ——— ECharts：洲际名额南丁格尔玫瑰图 ———
-const quotaOpt = ref({
-  tooltip: { trigger: 'item', backgroundColor: 'rgba(20,27,45,0.95)', borderColor: 'rgba(255,255,255,0.08)', textStyle: { color: '#E8ECF1' }, formatter: '{b}: {c}席 ({d}%)' },
-  legend: { orient: 'vertical', right: 6, top: 'center', textStyle: { color: '#8892A6', fontSize: 10 } },
-  series: [{
-    type: 'pie',
-    roseType: 'area',
-    radius: ['15%', '72%'],
-    center: ['38%', '50%'],
-    data: [
-      { name: '欧洲UEFA', value: 16, itemStyle: { color: '#22D3EE' } },
-      { name: '南美CONMEBOL', value: 6, itemStyle: { color: '#FBBF24' } },
-      { name: '非洲CAF', value: 9, itemStyle: { color: '#F43F5E' } },
-      { name: '亚洲AFC', value: 8, itemStyle: { color: '#34D399' } },
-      { name: '北中美CONCACAF', value: 6, itemStyle: { color: '#A78BFA' } },
-      { name: '大洋洲OFC', value: 1, itemStyle: { color: '#FB923C' } },
-      { name: '东道主', value: 2, itemStyle: { color: '#E2E8F0' } },
-    ],
-    label: { show: false },
-    emphasis: { label: { show: true, fontSize: 12, fontWeight: 'bold' } },
-  }]
+// ——— ECharts：洲际名额南丁格尔玫瑰图（增强版） ———
+const quotaDataMap = {
+  2026: [
+    { name: '欧洲UEFA', value: 16, color: '#22D3EE' },
+    { name: '南美CONMEBOL', value: 6, color: '#FBBF24' },
+    { name: '非洲CAF', value: 9, color: '#F43F5E' },
+    { name: '亚洲AFC', value: 8, color: '#34D399' },
+    { name: '北中美CONCACAF', value: 6, color: '#A78BFA' },
+    { name: '大洋洲OFC', value: 1, color: '#FB923C' },
+    { name: '东道主', value: 2, color: '#E2E8F0' },
+  ],
+  2022: [
+    { name: '欧洲UEFA', value: 13, color: '#22D3EE', change: -3 },
+    { name: '南美CONMEBOL', value: 4, color: '#FBBF24', change: -2 },
+    { name: '非洲CAF', value: 5, color: '#F43F5E', change: -4 },
+    { name: '亚洲AFC', value: 5, color: '#34D399', change: -3 },
+    { name: '北中美CONCACAF', value: 3, color: '#A78BFA', change: -3 },
+    { name: '大洋洲OFC', value: 0, color: '#FB923C', change: -1 },
+    { name: '东道主', value: 1, color: '#E2E8F0', change: -1 },
+    { name: '附加赛', value: 1, color: '#94A3B8' },
+  ]
+}
+
+function switchQuotaYear(year) {
+  quotaYear.value = year
+  quotaDetail.value = null
+}
+
+function onQuotaClick(params) {
+  if (params.name) {
+    const data = quotaDataMap[quotaYear.value]
+    const item = data.find(d => d.name === params.name)
+    if (item) {
+      const total = data.reduce((s, d) => s + d.value, 0)
+      const pct = Math.round(item.value / total * 100)
+      quotaDetail.value = {
+        name: item.name,
+        value: item.value,
+        pct: pct,
+        color: item.color,
+        change: item.change,
+      }
+    }
+  }
+}
+
+function onGoalsClick(params) {
+  // 点击折线图不做特殊处理，保留扩展空间
+}
+
+const quotaOpt = computed(() => {
+  const data = quotaDataMap[quotaYear.value]
+  return {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: 'rgba(8,15,32,0.96)',
+      borderColor: 'rgba(255,255,255,0.12)',
+      borderWidth: 1,
+      padding: [12, 16],
+      textStyle: { color: '#E8ECF1', fontSize: 12 },
+      extraCssText: 'backdrop-filter: blur(12px); border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);',
+      formatter: (p) => {
+        return `<div style="font-size:11px;color:#5A6478;margin-bottom:4px">${quotaYear.value} 名额分配</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};box-shadow:0 0 8px ${p.color}"></span>
+            <span style="font-weight:700;color:#E8ECF1">${p.name}</span>
+          </div>
+          <div style="margin-top:6px;font-weight:900;font-size:22px;color:${p.color}">${p.value}<span style="font-size:12px;font-weight:500;color:#8892A6"> 席</span></div>
+          <div style="color:#6B7B92;font-size:11px">占比 ${p.percent}%</div>`
+      }
+    },
+    legend: {
+      orient: 'vertical',
+      right: 6,
+      top: 'center',
+      textStyle: { color: '#6B7B92', fontSize: 10, fontWeight: 600 },
+      itemWidth: 8,
+      itemHeight: 8,
+      itemGap: 10,
+    },
+    series: [{
+      type: 'pie',
+      roseType: 'area',
+      radius: ['20%', '70%'],
+      center: ['38%', '50%'],
+      data: data.map(d => ({ name: d.name, value: d.value, itemStyle: { color: d.color, borderColor: 'rgba(11,15,26,0.8)', borderWidth: 3, shadowBlur: 8, shadowColor: d.color + '66' } })),
+      label: { show: false },
+      emphasis: {
+        label: { show: true, fontSize: 13, fontWeight: 'bold', color: '#E8ECF1' },
+        scaleSize: 14,
+        itemStyle: {
+          shadowBlur: 30,
+          shadowColor: 'rgba(0,0,0,0.5)',
+          borderWidth: 4,
+          borderColor: 'rgba(255,255,255,0.3)',
+        },
+      },
+      animationType: 'scale',
+      animationEasing: 'elasticOut',
+      animationDelay: (idx) => idx * 80,
+      // 外圈光环
+      itemStyle: {
+        borderRadius: 2,
+      },
+    }]
+  }
 })
 </script>
 
 <style scoped>
-.tab-overview { padding-top: 8px; }
+.tab-overview {
+  padding-top: 8px;
+  position: relative;
+}
+
+/* ========== 页面背景纹理 ========== */
+.tab-overview::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle, rgba(34,211,238,0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at 50% 20%, #000 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 20%, #000 30%, transparent 70%);
+}
+
+/* ========== 区块包装器（带主题色氛围光） ========== */
+.section-wrapper {
+  position: relative;
+  margin-bottom: 4px;
+  border-radius: 24px;
+  padding: 20px 24px 16px;
+  background: rgba(11, 15, 26, 0.35);
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.section-wrapper:hover {
+  border-color: rgba(255,255,255,0.10);
+}
+
+/* 各主题色区块 */
+.section-gold {
+  background: linear-gradient(160deg, rgba(30,24,10,0.55), rgba(15,21,38,0.65));
+  border-color: rgba(251,191,36,0.08);
+}
+
+.section-cyan {
+  background: linear-gradient(160deg, rgba(8,28,48,0.55), rgba(15,21,38,0.65));
+  border-color: rgba(34,211,238,0.08);
+}
+
+.section-mixed {
+  background: linear-gradient(160deg, rgba(20,16,32,0.55), rgba(15,21,38,0.65));
+  border-color: rgba(167,139,250,0.08);
+}
+
+.section-purple {
+  background: linear-gradient(160deg, rgba(24,10,36,0.55), rgba(15,21,38,0.65));
+  border-color: rgba(168,85,247,0.08);
+}
+
+.section-green {
+  background: linear-gradient(160deg, rgba(8,32,18,0.55), rgba(15,21,38,0.65));
+  border-color: rgba(34,211,153,0.08);
+}
+
+/* ========== 区块氛围光晕 ========== */
+.section-ambient-glow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.30;
+}
+
+.section-gold .section-ambient-glow {
+  top: -40px; right: -60px;
+  width: 300px; height: 200px;
+  background: radial-gradient(circle, rgba(251,191,36,0.25), transparent 70%);
+}
+
+.section-cyan .section-ambient-glow {
+  top: -30px; left: 20%;
+  width: 350px; height: 180px;
+  background: radial-gradient(ellipse, rgba(34,211,238,0.20), transparent 70%);
+}
+
+.section-mixed .section-ambient-glow {
+  top: -30px; right: 10%;
+  width: 320px; height: 200px;
+  background: radial-gradient(circle, rgba(167,139,250,0.18), transparent 65%);
+}
+
+.section-purple .section-ambient-glow {
+  bottom: -20px; left: -40px;
+  width: 280px; height: 160px;
+  background: radial-gradient(circle, rgba(168,85,247,0.20), transparent 70%);
+}
+
+.section-green .section-ambient-glow {
+  top: 10%; left: 30%;
+  width: 340px; height: 220px;
+  background: radial-gradient(ellipse, rgba(34,211,153,0.16), transparent 68%);
+}
+
+/* ========== 装饰分隔线 ========== */
+.section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  margin: 0 0 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+  max-width: 40%;
+}
+
+.section-divider::before {
+  margin-right: 14px;
+}
+
+.section-divider::after {
+  margin-left: 14px;
+}
+
+.divider-diamond {
+  width: 7px;
+  height: 7px;
+  background: rgba(34,211,238,0.35);
+  transform: rotate(45deg);
+  border-radius: 1px;
+  box-shadow: 0 0 8px rgba(34,211,238,0.30);
+  flex-shrink: 0;
+}
+
+/* ========== 区块标题增强 ========== */
+.sec-accent-line {
+  width: 3px;
+  height: 20px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.section-gold .sec-accent-line { background: linear-gradient(to bottom, #FBBF24, #F59E0B); box-shadow: 0 0 8px rgba(251,191,36,0.4); }
+.section-cyan .sec-accent-line { background: linear-gradient(to bottom, #22D3EE, #0891B2); box-shadow: 0 0 8px rgba(34,211,238,0.4); }
+.section-mixed .sec-accent-line { background: linear-gradient(to bottom, #A78BFA, #7C3AED); box-shadow: 0 0 8px rgba(167,139,250,0.4); }
+.section-purple .sec-accent-line { background: linear-gradient(to bottom, #C084FC, #9333EA); box-shadow: 0 0 8px rgba(168,85,247,0.4); }
+.section-green .sec-accent-line { background: linear-gradient(to bottom, #34D399, #059669); box-shadow: 0 0 8px rgba(34,211,153,0.4); }
+
+/* ========== 卡片玻璃拟态增强 ========== */
+.section-wrapper .card {
+  background: linear-gradient(160deg, rgba(20,27,45,0.70), rgba(15,21,38,0.75));
+  backdrop-filter: blur(4px);
+  border-color: rgba(255,255,255,0.06);
+}
+
+.section-wrapper .card:hover {
+  border-color: rgba(255,255,255,0.14);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* 冠军卡片微调 */
+.section-wrapper .champ-card {
+  background: linear-gradient(160deg, rgba(20,27,45,0.75), rgba(15,21,38,0.80));
+  backdrop-filter: blur(3px);
+}
+
+.section-wrapper .legend-card {
+  background: linear-gradient(160deg, rgba(20,27,45,0.75), rgba(15,21,38,0.80));
+  backdrop-filter: blur(3px);
+}
+
+/* ========== 各区块卡片顶部主题色描边 ========== */
+.section-cyan .card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(34,211,238,0.22), rgba(34,211,238,0.08), transparent);
+  border-radius: 2px 2px 0 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.section-mixed .card:nth-child(1)::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(251,191,36,0.22), rgba(251,191,36,0.08), transparent);
+  border-radius: 2px 2px 0 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.section-mixed .card:nth-child(2)::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(244,63,94,0.22), rgba(244,63,94,0.08), transparent);
+  border-radius: 2px 2px 0 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.section-purple .legend-card::before {
+  background: linear-gradient(90deg, transparent, rgba(168,85,247,0.25), rgba(168,85,247,0.10), transparent) !important;
+}
+
+/* ========== 区块内 section-head 增强 ========== */
+.section-wrapper .section-head {
+  position: relative;
+  z-index: 2;
+}
 
 /* ========== 顶部双栏 ========== */
 .top-grid {
@@ -1714,7 +2341,23 @@ const quotaOpt = ref({
   border-color: rgba(255,255,255,0.15);
   box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
 }
-.chart-panel { padding: 0; display: flex; flex-direction: column; }
+.chart-panel { padding: 0; display: flex; flex-direction: column; position: relative; }
+/* 图表卡片光晕背景 */
+.chart-panel::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  inset: 20% 15% 25% 15%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(34,211,238,0.06) 0%, transparent 70%);
+  transition: all 0.5s ease;
+}
+.chart-panel:hover::after {
+  background: radial-gradient(ellipse, rgba(34,211,238,0.12) 0%, rgba(251,191,36,0.05) 50%, transparent 70%);
+  inset: 10% 5% 15% 5%;
+}
+.chart-panel > * { position: relative; z-index: 1; }
 .panel-head { flex-shrink: 0; }
 .panel-head {
   display: flex; align-items: baseline; gap: 10px;
@@ -1728,6 +2371,220 @@ const quotaOpt = ref({
 .chart-wrap > * { width: 100%; height: 100%; }
 
 .gold-text { color: #FBBF24 !important; }
+
+/* ========== 进球趋势切换按钮组 ========== */
+.goals-toggle-group {
+  display: flex;
+  gap: 3px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 8px;
+  padding: 2px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.goals-toggle-btn {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6B7B92;
+  background: transparent;
+  transition: all 0.25s ease;
+}
+.goals-toggle-btn.active {
+  background: linear-gradient(135deg, #22D3EE, #0891B2);
+  color: #061225;
+  box-shadow: 0 2px 8px rgba(34,211,238,0.3);
+}
+.goals-toggle-btn:hover:not(.active) {
+  color: #22D3EE;
+}
+
+/* ========== 饼图中心文字 ========== */
+.pie-center-text {
+  position: absolute;
+  top: 50%;
+  left: 38%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  z-index: 5;
+}
+.pct-num {
+  display: block;
+  font-size: 28px;
+  font-weight: 1000;
+  color: #FBBF24;
+  line-height: 1;
+  text-shadow: 0 0 16px rgba(251,191,36,0.4);
+  font-family: 'DIN Alternate', 'Arial Black', 'Microsoft YaHei', sans-serif;
+}
+.pct-label {
+  display: block;
+  font-size: 11px;
+  color: #6B7B92;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+/* ========== 配额详情弹出卡片 ========== */
+.quota-detail-card {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  background: linear-gradient(160deg, rgba(20,27,45,0.96), rgba(11,15,26,0.98));
+  border: 1px solid rgba(34,211,238,0.18);
+  border-radius: 12px;
+  padding: 12px 16px;
+  z-index: 10;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.qdc-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #E8ECF1;
+  font-size: 13px;
+  font-weight: 700;
+}
+.qdc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.qdc-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #5A6478;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+.qdc-close:hover {
+  color: #F43F5E;
+  background: rgba(244,63,94,0.1);
+}
+.qdc-body {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #8892A6;
+}
+.qdc-body strong {
+  color: #E8ECF1;
+  font-weight: 700;
+}
+.qdc-up { color: #34D399; font-weight: 700; }
+.qdc-down { color: #F43F5E; font-weight: 700; }
+
+/* ========== 夺冠热门增强 ========== */
+.hot-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+.hot-shuffle-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(251,191,36,0.25);
+  background: rgba(251,191,36,0.08);
+  color: #FBBF24;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.hot-shuffle-btn:hover {
+  background: rgba(251,191,36,0.18);
+  border-color: rgba(251,191,36,0.5);
+  box-shadow: 0 4px 14px rgba(251,191,36,0.2);
+  transform: translateY(-1px);
+}
+.hot-shuffle-btn:active {
+  transform: scale(0.95);
+}
+
+.hot-row {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.hot-row.selected {
+  background: rgba(34,211,238,0.10) !important;
+  border-color: rgba(34,211,238,0.30) !important;
+  box-shadow: 0 0 16px rgba(34,211,238,0.15);
+}
+
+/* 趋势箭头 */
+.hot-trend {
+  font-size: 11px;
+  font-weight: 800;
+  min-width: 18px;
+  text-align: center;
+}
+.trend-up { color: #34D399; }
+.trend-down { color: #F43F5E; }
+
+/* 雷达图面板 */
+.radar-panel {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin-top: 8px;
+  padding: 12px 16px 8px;
+}
+.radar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  color: #E8ECF1;
+  font-size: 13px;
+  font-weight: 700;
+}
+.radar-wrap {
+  min-height: 200px;
+}
+.hot-panel.expanded {
+  border-color: rgba(34,211,238,0.2);
+}
+
+/* ========== 过渡动画 ========== */
+.slide-up-enter-active {
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.slide-up-leave-active {
+  transition: all 0.2s ease-in;
+}
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.slide-down-enter-active {
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.slide-down-leave-active {
+  transition: all 0.2s ease-in;
+}
+.slide-down-enter-from {
+  opacity: 0;
+  transform: translateY(-12px);
+}
+.slide-down-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
 
 /* 夺冠热门面板 */
 .hot-panel { padding: 0 0 18px; }

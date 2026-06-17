@@ -111,8 +111,11 @@
           </div>
           <!-- API配置提示 -->
           <div v-if="!apiConfigured" class="chat-api-hint">
-            ⚠️ 未配置API Key，当前使用本地知识库回复。
+            ⚠️ 未配置API Key，使用本地知识库。
             <button @click="showApiConfig = true">配置API</button>
+          </div>
+          <div v-else class="chat-api-hint ready">
+            ✅ DeepSeek AI 已就绪 · 开发环境通过 Vite 代理直连（无 CORS）
           </div>
         </div>
 
@@ -120,7 +123,7 @@
         <div v-if="showApiConfig" class="cmt-api-modal">
           <div class="cmt-api-card">
             <div class="cmt-api-title">配置 AI API</div>
-            <p class="cmt-api-desc">支持 OpenAI 兼容接口（DeepSeek / 通义千问 / 智谱等）</p>
+            <p class="cmt-api-desc">支持 DeepSeek 等 OpenAI 兼容 API · 开发环境已通过 Vite 代理转发（无需担心 CORS）</p>
             <label class="cmt-api-field">
               <span>API Key</span>
               <input v-model="apiKeyInput" type="password" placeholder="sk-..." />
@@ -225,10 +228,18 @@ const chatHistory = ref([])
 const chatLoading = ref(false)
 const chatMsgs = ref(null)
 const showApiConfig = ref(false)
-const apiKeyInput = ref(localStorage.getItem('cmt_api_key') || '')
-const apiBaseInput = ref(localStorage.getItem('cmt_api_base') || 'https://api.deepseek.com/v1')
-const apiModelInput = ref(localStorage.getItem('cmt_api_model') || 'deepseek-chat')
-const apiConfigured = ref(!!apiKeyInput.value)
+
+// 内置默认 API Key，开箱即用
+const BUILTIN_API_KEY = 'sk-6e38e365e92a437b8d64a1ff398924c0'
+const BUILTIN_BASE_URL = 'https://api.deepseek.com/v1'
+const BUILTIN_MODEL = 'deepseek-chat'
+
+// 只有用户手动保存了自己的 Key 才用 localStorage 的，否则默认用内置
+const savedKey = localStorage.getItem('cmt_api_key')
+const apiKeyInput = ref(savedKey || BUILTIN_API_KEY)
+const apiBaseInput = ref(localStorage.getItem('cmt_api_base') || BUILTIN_BASE_URL)
+const apiModelInput = ref(localStorage.getItem('cmt_api_model') || BUILTIN_MODEL)
+const apiConfigured = ref(true)  // 内置 Key 默认可用
 
 const suggestedQuestions = [
   '这个平台有哪些功能？',
@@ -260,6 +271,29 @@ async function sendMessage(text) {
   }
 }
 
+/**
+ * 将用户配置的 API 地址转换为实际请求 URL。
+ * 开发环境下通过 Vite proxy 代理 → 解决浏览器 CORS 限制。
+ */
+function resolveApiUrl(baseUrl) {
+  const trimmed = baseUrl.replace(/\/$/, '')
+
+  // 开发环境：DeepSeek 走 Vite proxy
+  if (import.meta.env.DEV) {
+    if (trimmed.includes('api.deepseek.com')) {
+      const path = trimmed.replace('https://api.deepseek.com', '')
+      return '/api/deepseek' + (path || '') + '/chat/completions'
+    }
+    // 其他 OpenAI 兼容 API 如果也有 CORS 问题，可在此扩展
+  }
+
+  // 生产环境或非标准 API：直连（可能被浏览器 CORS 拦截）
+  if (!trimmed.endsWith('/chat/completions')) {
+    return trimmed + '/chat/completions'
+  }
+  return trimmed
+}
+
 async function callAI(msg) {
   chatLoading.value = true
   try {
@@ -271,11 +305,9 @@ async function callAI(msg) {
       ...chatHistory.value.map(m => ({ role: m.role, content: m.content }))
     ]
 
-    // 智能拼接 API URL：如果已包含 /chat/completions 则直接使用，否则补全
-    let apiUrl = apiBaseInput.value.replace(/\/$/, '')
-    if (!apiUrl.endsWith('/chat/completions')) {
-      apiUrl += '/chat/completions'
-    }
+    const apiUrl = resolveApiUrl(apiBaseInput.value)
+
+    console.log('[AI解说] 请求地址:', apiUrl, '(DEV:', import.meta.env.DEV, ')')
 
     const res = await fetch(apiUrl, {
       method: 'POST',
@@ -291,12 +323,16 @@ async function callAI(msg) {
       })
     })
 
-    if (!res.ok) throw new Error('API请求失败: ' + res.status)
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '')
+      throw new Error(`API请求失败 (${res.status}): ${errText.slice(0, 100)}`)
+    }
     const data = await res.json()
     const reply = data.choices?.[0]?.message?.content || '抱歉，我暂时无法回答这个问题。'
     chatHistory.value.push({ role: 'assistant', content: reply })
   } catch (e) {
-    chatHistory.value.push({ role: 'assistant', content: 'API调用失败：' + e.message + '。请检查API配置或切换本地知识库模式。' })
+    console.error('[AI解说] 调用失败:', e)
+    chatHistory.value.push({ role: 'assistant', content: 'API调用失败：' + e.message + '。请检查API配置（Base URL 设为 https://api.deepseek.com，开发环境已通过Vite代理转发）。' })
   } finally {
     chatLoading.value = false
     await scrollToBottom()
@@ -676,6 +712,12 @@ async function scrollToBottom() {
   background: rgba(251,191,36,0.06);
   border-top: 1px solid rgba(251,191,36,0.1);
   display: flex; align-items: center; justify-content: space-between;
+}
+.chat-api-hint.ready {
+  color: #34D399;
+  background: rgba(52,211,153,0.06);
+  border-top: 1px solid rgba(52,211,153,0.1);
+  justify-content: center;
 }
 .chat-api-hint button {
   background: none; border: none;

@@ -1,5 +1,5 @@
 <template>
-  <span class="flag-tag" :class="{ large, small }">
+  <span class="flag-tag" :class="{ large, small, tiny }">
     <img
       :src="`https://flagcdn.com/${size}/${code}.png`"
       :alt="name"
@@ -21,10 +21,11 @@ const props = defineProps({
   name: { type: String, default: '' },
   large: { type: Boolean, default: false },
   small: { type: Boolean, default: false },
+  tiny: { type: Boolean, default: false },
 })
 
 const showFallback = ref(false)
-const size = computed(() => props.small ? '24x18' : (props.large ? '48x36' : '32x24'))
+const size = computed(() => props.tiny ? '16x12' : (props.small ? '24x18' : (props.large ? '48x36' : '32x24')))
 </script>
 
 <style scoped>
@@ -36,8 +37,9 @@ const size = computed(() => props.small ? '24x18' : (props.large ? '48x36' : '32
   box-shadow: 0 1px 4px rgba(0,0,0,0.3);
   object-fit: cover;
 }
+.flag-tag.tiny .flag-img { width: 14px; height: 11px; border-radius: 2px; }
 .flag-tag.small .flag-img { width: 20px; height: 15px; border-radius: 2px; }
-.flag-tag:not(.small):not(.large) .flag-img { width: 26px; height: 19px; }
+.flag-tag:not(.small):not(.large):not(.tiny) .flag-img { width: 26px; height: 19px; }
 .flag-tag.large .flag-img { width: 40px; height: 30px; border-radius: 4px; }
 .flag-fallback {
   display: inline-flex; align-items: center; justify-content: center;
@@ -50,5 +52,6 @@ const size = computed(() => props.small ? '24x18' : (props.large ? '48x36' : '32
   color: #E8ECF1;
 }
 .flag-tag.small .flag-name { font-size: 12px; }
+.flag-tag.tiny .flag-name { font-size: 11px; }
 .flag-tag.large .flag-name { font-size: 16px; font-weight: 600; }
 </style>
